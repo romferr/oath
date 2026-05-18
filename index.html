@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oath - Chroniques d'Empire et d'Exil (Digital Tablet)</title>
-    <!-- Tailwind CSS pour un rendu professionnel -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=IM+Fell+English+SC&display=swap');
@@ -25,175 +24,182 @@
 </head>
 <body class="h-screen w-screen overflow-hidden flex flex-col text-stone-200 p-2 select-none">
 
+    <!-- ÉCRAN DE RÉSULTAT FLASH (POP-UP D'ACTION) -->
+    <div id="action-popup" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-gradient-to-b from-stone-900 to-stone-950 border-2 border-amber-500 rounded-xl p-6 max-w-sm w-full text-center shadow-2xl animate-fade-in">
+            <div id="popup-icon" class="text-4xl mb-2">🔍</div>
+            <h3 id="popup-title" class="font-oath text-lg font-bold text-amber-400 tracking-wide uppercase">Action Réussie</h3>
+            <p id="popup-message" class="text-sm my-4 text-stone-300 leading-relaxed"></p>
+            <button onclick="closePopup()" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-50 py-2 rounded font-oath text-xs uppercase tracking-wider cursor-pointer">
+                Ajouter à mon inventaire
+            </button>
+        </div>
+    </div>
+
     <!-- BARRE SUPÉRIEURE : STATUT DU ROYAUME -->
     <header class="w-full bg-stone-900/90 border border-stone-800 rounded-lg p-2 mb-2 flex justify-between items-center shadow-md shrink-0">
         <div class="flex items-center gap-4">
             <h1 class="font-oath text-xl font-bold tracking-wider text-amber-500">OATH</h1>
-            <span class="text-xs uppercase tracking-widest text-stone-500 border border-stone-700 px-2 py-0.5 rounded bg-black/40">
-                Chronique Active
-            </span>
+            <span class="text-xs uppercase tracking-widest text-stone-500 border border-stone-700 px-2 py-0.5 rounded bg-black/40">Chronique Active</span>
         </div>
         
-        <!-- Objectif de la Chronique / Bannières -->
         <div class="flex gap-3 text-xs">
-            <div id="banner-favor" class="bg-amber-950/40 border border-amber-600/50 text-amber-300 px-3 py-1 rounded flex items-center gap-2 shadow-inner">
+            <div class="bg-amber-950/40 border border-amber-600/50 text-amber-300 px-3 py-1 rounded flex items-center gap-2">
                 <span>👑 Faveur du Peuple :</span> <strong id="holder-favor">Prince</strong>
             </div>
-            <div id="banner-secret" class="bg-purple-950/40 border border-purple-600/50 text-purple-300 px-3 py-1 rounded flex items-center gap-2 shadow-inner">
+            <div class="bg-purple-950/40 border border-purple-600/50 text-purple-300 px-3 py-1 rounded flex items-center gap-2">
                 <span>👁️ Plus Sombre Secret :</span> <strong id="holder-secret">Aucun</strong>
             </div>
         </div>
 
-        <!-- État du Prince Mécanique (L'Automate) -->
         <div class="bg-red-950/30 border border-red-900/60 rounded px-3 py-1 text-right">
             <span class="text-[10px] uppercase text-red-400 font-semibold block tracking-wider">Menace du Prince</span>
             <div class="text-sm font-mono text-red-200 font-bold" id="bot-threat-track">⚙️ ⚙️ ⚙️ ░ ░ ░ (3/6)</div>
         </div>
     </header>
 
-    <!-- ZONE CENTRALE : LE PLATEAU DE JEU -->
+    <!-- ZONE CENTRALE : ROYAUME & CHRONIQUE -->
     <div class="flex-1 grid grid-cols-3 gap-2 min-h-0 mb-2">
-        
-        <!-- LE ROYAUME (LES 3 RÉGIONS) -->
+        <!-- CARTE DU ROYAUME -->
         <section class="col-span-2 bg-stone-900/40 border border-stone-800/80 rounded-xl p-3 flex flex-col justify-between gap-2 shadow-inner">
             <h2 class="font-oath text-xs uppercase tracking-widest text-stone-400 border-b border-stone-800 pb-1">Carte du Royaume</h2>
             
-            <!-- Région 1 : Le Berceau (Cradle) -->
             <div id="region-0" class="flex-1 bg-gradient-to-r from-cyan-950/40 to-stone-900/60 border-2 border-stone-700/60 rounded-lg p-3 flex items-center justify-between transition-all">
                 <div>
                     <span class="text-[10px] font-bold uppercase text-cyan-400 tracking-wider">Région I</span>
                     <h3 class="font-oath text-lg font-bold text-stone-100">Le Berceau de l'Empire</h3>
-                    <p class="text-xs text-stone-400 italic mt-0.5">Le siège historique du pouvoir corrompu.</p>
                 </div>
-                <div class="flex gap-4 items-center bg-black/40 p-2 rounded border border-stone-800">
-                    <div class="text-center"><span class="block text-[10px] text-stone-500 uppercase">Contrôle</span><strong class="text-red-400 font-bold text-sm" id="reg-control-0">Prince</strong></div>
-                    <div class="text-center"><span class="block text-[10px] text-stone-500 uppercase">Garnison</span><strong class="text-stone-200 text-lg" id="reg-warbands-0">4 👤</strong></div>
+                <div class="flex gap-4 items-center bg-black/40 p-2 rounded border border-stone-800 text-xs">
+                    <div class="text-center"><span class="block text-[10px] text-stone-500 uppercase">Contrôle</span><strong class="text-red-400 font-bold" id="reg-control-0">Prince</strong></div>
+                    <div class="text-center"><span class="block text-[10px] text-stone-500 uppercase">Garnison</span><strong class="text-stone-200 text-sm" id="reg-warbands-0">4 👤</strong></div>
                 </div>
             </div>
 
-            <!-- Région 2 : Les Provinces -->
             <div id="region-1" class="flex-1 bg-gradient-to-r from-amber-950/20 to-stone-900/60 border-2 border-stone-700/60 rounded-lg p-3 flex items-center justify-between transition-all">
                 <div>
                     <span class="text-[10px] font-bold uppercase text-amber-400 tracking-wider">Région II</span>
                     <h3 class="font-oath text-lg font-bold text-stone-100">Les Provinces Fertiles</h3>
-                    <p class="text-xs text-stone-400 italic mt-0.5">Terres d'échanges surveillées par les collecteurs de taxes.</p>
                 </div>
-                <div class="flex gap-4 items-center bg-black/40 p-2 rounded border border-stone-800">
-                    <div class="text-center"><span class="block text-[10px] text-stone-500 uppercase">Contrôle</span><strong class="text-red-400 font-bold text-sm" id="reg-control-1">Prince</strong></div>
-                    <div class="text-center"><span class="block text-[10px] text-stone-500 uppercase">Garnison</span><strong class="text-stone-200 text-lg" id="reg-warbands-1">2 👤</strong></div>
+                <div class="flex gap-4 items-center bg-black/40 p-2 rounded border border-stone-800 text-xs">
+                    <div class="text-center"><span class="block text-[10px] text-stone-500 uppercase">Contrôle</span><strong class="text-red-400 font-bold" id="reg-control-1">Prince</strong></div>
+                    <div class="text-center"><span class="block text-[10px] text-stone-500 uppercase">Garnison</span><strong class="text-stone-200 text-sm" id="reg-warbands-1">2 👤</strong></div>
                 </div>
             </div>
 
-            <!-- Région 3 : Les Confins (Hinterlands) -->
-            <div id="region-2" class="flex-1 bg-gradient-to-r from-emerald-950/30 to-stone-900/60 border-2 border-amber-500/50 rounded-lg p-3 flex items-center justify-between transition-all shadow-[0_0_10px_rgba(245,158,11,0.05)]">
+            <div id="region-2" class="flex-1 bg-gradient-to-r from-emerald-950/30 to-stone-900/60 border-2 border-amber-500/50 rounded-lg p-3 flex items-center justify-between transition-all">
                 <div>
                     <span class="text-[10px] font-bold uppercase text-emerald-400 tracking-wider">Région III</span>
                     <h3 class="font-oath text-lg font-bold text-amber-400">Les Confins Sauvages</h3>
-                    <p class="text-xs text-stone-400 italic mt-0.5">Là où les Exilés rassemblent leurs forces loin des yeux du tyran.</p>
                 </div>
-                <div class="flex gap-4 items-center bg-black/40 p-2 rounded border border-stone-800">
-                    <div class="text-center"><span class="block text-[10px] text-amber-500 uppercase">Contrôle</span><strong class="text-emerald-400 font-bold text-sm" id="reg-control-2">Vous (Exilé)</strong></div>
-                    <div class="text-center"><span class="block text-[10px] text-amber-500 uppercase">Vos Troupes</span><strong class="text-amber-300 text-lg" id="reg-warbands-2">3 👤</strong></div>
+                <div class="flex gap-4 items-center bg-black/40 p-2 rounded border border-stone-800 text-xs">
+                    <div class="text-center"><span class="block text-[10px] text-amber-500 uppercase">Contrôle</span><strong class="text-emerald-400 font-bold" id="reg-control-2">Vous</strong></div>
+                    <div class="text-center"><span class="block text-[10px] text-amber-500 uppercase">Vos Troupes</span><strong class="text-amber-300 text-sm" id="reg-warbands-2">3 👤</strong></div>
                 </div>
             </div>
         </section>
 
-        <!-- CHRONIQUE & LOGS DES DÉS -->
+        <!-- CHRONIQUE ET HISTORIQUE -->
         <section class="bg-stone-950/80 border border-stone-800 rounded-xl p-3 flex flex-col justify-between shadow-2xl">
-            <h2 class="font-oath text-xs uppercase tracking-widest text-stone-500 border-b border-stone-900 pb-1">Chronique du Monde</h2>
-            <!-- Fenêtre de défilement des logs -->
-            <div id="log-box" class="flex-1 my-2 overflow-y-auto custom-scroll text-xs font-mono space-y-2 pr-1 text-stone-400">
-                <div class="text-amber-500/80">[Chronique] Début de l'Âge de l'Exil. Vous êtes stationné dans les Confins Sauvages. Remplissez votre Serment de Suprématie en capturant le Royaume !</div>
+            <h2 class="font-oath text-xs uppercase tracking-widest text-stone-500 border-b border-stone-900 pb-1">Journal de la Chronique</h2>
+            <div id="log-box" class="flex-1 my-2 overflow-y-auto custom-scroll text-[11px] font-mono space-y-2 pr-1 text-stone-400">
+                <div class="text-amber-500/80">[Chronique] Début de la rébellion contre le Prince Mécanique.</div>
             </div>
-            <!-- Bouton Fin de tour -->
-            <button onclick="endTurn()" class="w-full bg-amber-900 hover:bg-amber-800 border border-amber-700 py-3 rounded-lg font-oath font-bold tracking-widest text-amber-100 uppercase text-sm shadow-md transition-all active:scale-[0.98] cursor-pointer">
-                🔔 Passer le Tour (Restaurer Réserve)
+            <button onclick="endTurn()" class="w-full bg-amber-900 hover:bg-amber-800 border border-amber-700 py-2.5 rounded-lg font-oath font-bold tracking-widest text-amber-100 uppercase text-xs shadow-md transition-all active:scale-[0.98] cursor-pointer">
+                🔔 Fin de Tour (Réserve 🔹 Max)
             </button>
         </section>
     </div>
 
+    <!-- NOUVELLE ZONE INTERMÉDIAIRE : CARTES & RELIQUES DU JOUEUR -->
+    <div class="grid grid-cols-2 gap-2 mb-2 shrink-0">
+        <!-- ZONE CONSEILLER (VOS CARTES ALLIÉES) -->
+        <div class="bg-stone-900/60 border border-stone-800 p-2 rounded-xl flex flex-col h-28">
+            <span class="text-[10px] uppercase font-oath tracking-widest text-amber-500/80 mb-1">📜 Votre Conseiller (Cartes alliées en main)</span>
+            <div id="cards-container" class="flex-1 flex gap-2 overflow-x-auto custom-scroll items-center py-1">
+                <span class="text-xs text-stone-500 italic m-auto">Aucun allié recruté pour le moment. Cherchez dans le deck !</span>
+            </div>
+        </div>
+
+        <!-- ZONE INVENTAIRE (RELIQUES & BANNIÈRES) -->
+        <div class="bg-stone-900/60 border border-stone-800 p-2 rounded-xl flex flex-col h-28">
+            <span class="text-[10px] uppercase font-oath tracking-widest text-purple-400 mb-1">💎 Vos Reliques & Objets Sacrés</span>
+            <div id="relics-container" class="flex-1 flex gap-2 overflow-x-auto custom-scroll items-center py-1">
+                <span class="text-xs text-stone-500 italic m-auto">Votre sac de butin est vide. Utilisez l'action "Récupérer".</span>
+            </div>
+        </div>
+    </div>
+
     <!-- ZONE INFÉRIEURE : PLATEAU DE L'EXILÉ (PLAYER MAT) -->
     <footer class="w-full bg-gradient-to-b from-stone-900 to-stone-950 border-t-4 border-amber-600 rounded-xl p-3 shadow-2xl shrink-0 flex flex-col gap-3">
-        
-        <!-- RESSOUCES ET PISTE DE RÉSERVE -->
+        <!-- RESSOURCES ET PISTE DE RÉSERVE -->
         <div class="flex justify-between items-center border-b border-stone-800 pb-2">
-            <!-- Inventaire Jetons -->
-            <div class="flex gap-4">
-                <div class="bg-stone-950 border border-stone-800 rounded px-4 py-1 flex items-center gap-2">
-                    <span class="text-lg">👤</span> <span class="text-xs uppercase text-stone-400">Armée :</span> <strong id="p-warbands" class="text-amber-400 text-lg font-mono">3</strong>
+            <div class="flex gap-2">
+                <div class="bg-stone-950 border border-stone-800 rounded px-3 py-1 flex items-center gap-1.5 text-xs">
+                    <span>👤</span> <span class="text-[10px] uppercase text-stone-400">Armée :</span> <strong id="p-warbands" class="text-amber-400 font-mono text-sm">3</strong>
                 </div>
-                <div class="bg-stone-950 border border-stone-800 rounded px-4 py-1 flex items-center gap-2">
-                    <span class="text-lg">🪙</span> <span class="text-xs uppercase text-stone-400">Faveur :</span> <strong id="p-favor" class="text-amber-400 text-lg font-mono">2</strong>
+                <div class="bg-stone-950 border border-stone-800 rounded px-3 py-1 flex items-center gap-1.5 text-xs">
+                    <span>🪙</span> <span class="text-[10px] uppercase text-stone-400">Faveur :</span> <strong id="p-favor" class="text-amber-400 font-mono text-sm">2</strong>
                 </div>
-                <div class="bg-stone-950 border border-stone-800 rounded px-4 py-1 flex items-center gap-2">
-                    <span class="text-lg">👁️</span> <span class="text-xs uppercase text-stone-400">Secrets :</span> <strong id="p-secrets" class="text-amber-400 text-lg font-mono">1</strong>
+                <div class="bg-stone-950 border border-stone-800 rounded px-3 py-1 flex items-center gap-1.5 text-xs">
+                    <span>👁️</span> <span class="text-[10px] uppercase text-stone-400">Secrets :</span> <strong id="p-secrets" class="text-amber-400 font-mono text-sm">1</strong>
                 </div>
-                <div class="bg-stone-950 border border-stone-800 rounded px-4 py-1 flex items-center gap-2">
-                    <span class="text-lg">🏆</span> <span class="text-xs uppercase text-stone-400">Prestige :</span> <strong id="p-prestige" class="text-amber-500 text-lg font-mono">1/10</strong>
+                <div class="bg-stone-950 border border-stone-800 rounded px-3 py-1 flex items-center gap-1.5 text-xs">
+                    <span>🏆</span> <span class="text-[10px] uppercase text-stone-400">Prestige :</span> <strong id="p-prestige" class="text-amber-500 font-mono text-sm">1/10</strong>
                 </div>
             </div>
 
-            <!-- Position actuelle -->
-            <div class="text-xs text-stone-400">
-                📍 Position actuelle : <strong class="text-amber-400 font-oath" id="player-pos-text">Les Confins Sauvages</strong>
-            </div>
+            <div class="text-xs text-stone-400">📍 Position : <strong class="text-amber-400 font-oath" id="player-pos-text">Les Confins Sauvages</strong></div>
 
-            <!-- PISTE DE RÉSERVE (6 JETONS) -->
-            <div class="flex items-center gap-2 bg-stone-950 p-1.5 rounded-lg border border-stone-800 shadow-inner">
-                <span class="text-[10px] font-bold uppercase tracking-widest text-stone-500 mr-1">Réserve (Action Points) :</span>
+            <div class="flex items-center gap-2 bg-stone-950 p-1 rounded-lg border border-stone-800">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-stone-500">Réserve :</span>
                 <div class="flex gap-1" id="reserve-track"></div>
             </div>
         </div>
 
-        <!-- ACTIONS DU PLATEAU PERSONNEL -->
+        <!-- LES 6 ACTIONS DU PLATEAU PERSONNEL -->
         <div class="grid grid-cols-6 gap-2">
-            <!-- ACTION 1: VOYAGER -->
-            <button onclick="playAction('travel')" class="bg-stone-900 border border-stone-700/60 rounded-lg p-2 text-center transition-all hover:bg-stone-800 active:scale-95 group cursor-pointer">
-                <div class="text-xs font-bold text-amber-500 uppercase tracking-wide group-hover:text-amber-400">🧭 Voyager</div>
-                <div class="text-[10px] text-cyan-400 my-1 font-mono">Coût : 1 🔹</div>
-                <div class="text-[11px] text-stone-400 leading-tight">Se déplacer vers une autre région du Royaume.</div>
+            <button onclick="playAction('travel')" class="bg-stone-900 border border-stone-700/60 rounded-lg p-2 text-center hover:bg-stone-800 active:scale-95 cursor-pointer">
+                <div class="text-xs font-bold text-amber-500 uppercase">🧭 Voyager</div>
+                <div class="text-[9px] text-cyan-400 font-mono my-0.5">Coût : 1 🔹</div>
+                <div class="text-[10px] text-stone-400 leading-tight">Changer de région.</div>
             </button>
 
-            <!-- ACTION 2: CHERCHER -->
-            <button onclick="playAction('search')" class="bg-stone-900 border border-stone-700/60 rounded-lg p-2 text-center transition-all hover:bg-stone-800 active:scale-95 group cursor-pointer">
-                <div class="text-xs font-bold text-amber-500 uppercase tracking-wide group-hover:text-amber-400">🔍 Chercher</div>
-                <div class="text-[10px] text-cyan-400 my-1 font-mono">Coût : 2 🔹</div>
-                <div class="text-[11px] text-stone-400 leading-tight">Fouiller le deck mondial pour trouver alliés ou trésors.</div>
+            <button onclick="playAction('search')" class="bg-stone-900 border border-stone-700/60 rounded-lg p-2 text-center hover:bg-stone-800 active:scale-95 cursor-pointer">
+                <div class="text-xs font-bold text-amber-500 uppercase">🔍 Chercher</div>
+                <div class="text-[9px] text-cyan-400 font-mono my-0.5">Coût : 2 🔹</div>
+                <div class="text-[10px] text-stone-400 leading-tight">Piocher des cartes.</div>
             </button>
 
-            <!-- ACTION 3: ENRÔLER -->
-            <button onclick="playAction('muster')" class="bg-stone-900 border border-stone-700/60 rounded-lg p-2 text-center transition-all hover:bg-stone-800 active:scale-95 group cursor-pointer">
-                <div class="text-xs font-bold text-amber-500 uppercase tracking-wide group-hover:text-amber-400">🛡️ Enrôler</div>
-                <div class="text-[10px] text-cyan-400 my-1 font-mono">Coût : 1 🔹</div>
-                <div class="text-[11px] text-stone-400 leading-tight">Dépenser 1 Faveur pour lever +2 Armées sur votre site.</div>
+            <button onclick="playAction('muster')" class="bg-stone-900 border border-stone-700/60 rounded-lg p-2 text-center hover:bg-stone-800 active:scale-95 cursor-pointer">
+                <div class="text-xs font-bold text-amber-500 uppercase">🛡️ Enrôler</div>
+                <div class="text-[9px] text-cyan-400 font-mono my-0.5">Coût : 1 🔹</div>
+                <div class="text-[10px] text-stone-400 leading-tight">Payer 1 🪙 pour +2 👤.</div>
             </button>
 
-            <!-- ACTION 4: COMMERCER -->
-            <button onclick="playAction('trade')" class="bg-stone-900 border border-stone-700/60 rounded-lg p-2 text-center transition-all hover:bg-stone-800 active:scale-95 group cursor-pointer">
-                <div class="text-xs font-bold text-amber-500 uppercase tracking-wide group-hover:text-amber-400">⚖️ Commercer</div>
-                <div class="text-[10px] text-cyan-400 my-1 font-mono">Coût : 1 🔹</div>
-                <div class="text-[11px] text-stone-400 leading-tight">Convertir 1 Secret en 2 Faveurs (ou inversement si Faveur dispo).</div>
+            <button onclick="playAction('trade')" class="bg-stone-900 border border-stone-700/60 rounded-lg p-2 text-center hover:bg-stone-800 active:scale-95 cursor-pointer">
+                <div class="text-xs font-bold text-amber-500 uppercase">⚖️ Commercer</div>
+                <div class="text-[9px] text-cyan-400 font-mono my-0.5">Coût : 1 🔹</div>
+                <div class="text-[10px] text-stone-400 leading-tight">Troc Faveur / Secret.</div>
             </button>
 
-            <!-- ACTION 5: RÉCUPÉRER -->
-            <button onclick="playAction('recover')" class="bg-stone-900 border border-stone-700/60 rounded-lg p-2 text-center transition-all hover:bg-stone-800 active:scale-95 group cursor-pointer">
-                <div class="text-xs font-bold text-amber-500 uppercase tracking-wide group-hover:text-amber-400">👑 Récupérer</div>
-                <div class="text-[10px] text-cyan-400 my-1 font-mono">Coût : 1 🔹</div>
-                <div class="text-[11px] text-stone-400 leading-tight">Revendiquer une Bannière (Requis: 4 Faveurs ou 2 Secrets).</div>
+            <button onclick="playAction('recover')" class="bg-stone-900 border border-stone-700/60 rounded-lg p-2 text-center hover:bg-stone-800 active:scale-95 cursor-pointer">
+                <div class="text-xs font-bold text-amber-500 uppercase">👑 Récupérer</div>
+                <div class="text-[9px] text-cyan-400 font-mono my-0.5">Coût : 1 🔹</div>
+                <div class="text-[10px] text-stone-400 leading-tight">Prendre les Bannières.</div>
             </button>
 
-            <!-- ACTION 6: CAMPAGNE -->
-            <button onclick="playAction('campaign')" class="bg-red-950/40 border border-red-800/80 rounded-lg p-2 text-center transition-all hover:bg-red-900/40 active:scale-95 group cursor-pointer">
-                <div class="text-xs font-bold text-red-400 uppercase tracking-wide group-hover:text-red-300">⚔️ Campagne</div>
-                <div class="text-[10px] text-cyan-400 my-1 font-mono">Coût : 2 🔹</div>
-                <div class="text-[11px] text-stone-400 leading-tight">Lancer une guerre de dés pour conquérir la région actuelle.</div>
+            <button onclick="playAction('campaign')" class="bg-red-950/40 border border-red-800/80 rounded-lg p-2 text-center hover:bg-red-900/40 active:scale-95 cursor-pointer">
+                <div class="text-xs font-bold text-red-400 uppercase">⚔️ Campagne</div>
+                <div class="text-[9px] text-cyan-400 font-mono my-0.5">Coût : 2 🔹</div>
+                <div class="text-[10px] text-stone-400 leading-tight">Guerre de territoire.</div>
             </button>
         </div>
     </footer>
 
-    <!-- LOGIQUE LOGICIELLE FIXÉE ET VÉRIFIÉE -->
+    <!-- ENGINE LOGIQUE REVISITÉ AVEC LE SYSTÈME DE CARTES ET POPUPS -->
     <script>
         let player = { reserve: 6, warbands: 3, favor: 2, secrets: 1, prestige: 1, location: 2 };
+        let inventory = { cards: [], relics: [] };
         let bot = { threat: 3 };
         let regions = [
             { name: "Le Berceau de l'Empire", control: "Prince", warbands: 4 },
@@ -203,7 +209,25 @@
         let banners = { favor: "Prince", secret: "Aucun" };
         let isGameOver = false;
 
-        const logBox = document.getElementById('log-box');
+        // Base de données de cartes d'alliances inspirées d'Oath
+        const OATH_DECK = [
+            { title: "Éclaireurs Renégats", type: "Allié", desc: "Permet de réduire le coût de Voyage.", icon: "🏹", textCode: " scouting" },
+            { title: "Garde du Corps Fidèle", type: "Allié", desc: "+1 dé lors des Campagnes défensives.", icon: "💂" },
+            { title: "Grand Archiviste", type: "Allié", desc: "Gagnez des secrets à moindre coût.", icon: "🧙" },
+            { title: "Marchand Ambulant", type: "Allié", desc: "Améliore la rentabilité de l'action Troc.", icon: "🎪" },
+            { title: "Ordre des Protecteurs", type: "Allié", desc: "Sécurise vos territoires conquis.", icon: "🛡️" }
+        ];
+
+        function triggerVisualResult(icon, title, text) {
+            document.getElementById('popup-icon').innerText = icon;
+            document.getElementById('popup-title').innerText = title;
+            document.getElementById('popup-message').innerHTML = text;
+            document.getElementById('action-popup').classList.remove('hidden');
+        }
+
+        function closePopup() {
+            document.getElementById('action-popup').classList.add('hidden');
+        }
 
         function updateUI() {
             document.getElementById('p-warbands').innerText = player.warbands;
@@ -215,31 +239,63 @@
             document.getElementById('holder-favor').innerText = banners.favor;
             document.getElementById('holder-secret').innerText = banners.secret;
 
+            // Mise à jour de la jauge menace bot
             let threatStr = "";
-            for (let i = 1; i <= 6; i++) {
-                threatStr += i <= bot.threat ? "⚙️ " : "░ ";
-            }
+            for (let i = 1; i <= 6; i++) threatStr += i <= bot.threat ? "⚙️ " : "░ ";
             document.getElementById('bot-threat-track').innerText = `${threatStr} (${bot.threat}/6)`;
 
+            // Mise à jour des cartes Régions
             for(let i=0; i<3; i++) {
                 document.getElementById(`reg-control-${i}`).innerText = regions[i].control === "Vous" ? "Vous (Exilé)" : "Prince";
-                document.getElementById(`reg-control-${i}`).className = regions[i].control === "Vous" ? "text-emerald-400 font-bold text-sm" : "text-red-400 font-bold text-sm";
+                document.getElementById(`reg-control-${i}`).className = regions[i].control === "Vous" ? "text-emerald-400 font-bold" : "text-red-400 font-bold";
                 document.getElementById(`reg-warbands-${i}`).innerText = `${regions[i].warbands} 👤`;
                 
                 let regElement = document.getElementById(`region-${i}`);
                 if(player.location === i) {
-                    regElement.className = regElement.className.replace(/border-stone-700\/60|border-amber-500\/50/g, '') + " border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.3)]";
+                    regElement.className = regElement.className.replace(/border-stone-700\/60|border-amber-500\/50/g, '') + " border-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.25)]";
                 } else {
                     regElement.className = regElement.className.replace(/border-amber-500|shadow-\[.*\]/g, '') + " border-stone-700/60";
                 }
             }
 
+            // Piste de Réserve
             const reserveTrack = document.getElementById('reserve-track');
             reserveTrack.innerHTML = "";
             for (let i = 1; i <= 6; i++) {
                 const token = document.createElement('div');
-                token.className = `w-4 h-4 rounded-full border border-cyan-500 shadow-sm transition-all ${i <= player.reserve ? 'bg-cyan-500 shadow-cyan-500/50' : 'bg-transparent border-dashed border-stone-700'}`;
+                token.className = `w-3.5 h-3.5 rounded-full border border-cyan-500 ${i <= player.reserve ? 'bg-cyan-500 shadow-sm shadow-cyan-500/50' : 'bg-transparent border-dashed border-stone-700'}`;
                 reserveTrack.appendChild(token);
+            }
+
+            // RENDU DYNAMIQUE DE L'INTERFACE DES CARTES EN MAIN (CONSEILLER)
+            const cardsContainer = document.getElementById('cards-container');
+            if(inventory.cards.length === 0) {
+                cardsContainer.innerHTML = `<span class="text-xs text-stone-500 italic m-auto">Aucun allié recruté. Faites l'action "Chercher".</span>`;
+            } else {
+                cardsContainer.innerHTML = "";
+                inventory.cards.forEach(card => {
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = "flex-shrink-0 w-36 bg-gradient-to-b from-stone-800 to-stone-900 border border-amber-800/60 rounded p-1.5 text-center text-[11px] shadow-md";
+                    cardDiv.innerHTML = `
+                        <div class="font-bold text-amber-400 truncate">${card.icon} ${card.title}</div>
+                        <div class="text-[9px] text-stone-400 mt-0.5 leading-tight">${card.desc}</div>
+                    `;
+                    cardsContainer.appendChild(cardDiv);
+                });
+            }
+
+            // RENDU DYNAMIQUE DES RELIQUES ET BANNIÈRES
+            const relicsContainer = document.getElementById('relics-container');
+            if(inventory.relics.length === 0) {
+                relicsContainer.innerHTML = `<span class="text-xs text-stone-500 italic m-auto">Aucun artefact sacré sous votre garde.</span>`;
+            } else {
+                relicsContainer.innerHTML = "";
+                inventory.relics.forEach(relic => {
+                    const relicDiv = document.createElement('div');
+                    relicDiv.className = "flex-shrink-0 px-3 py-1.5 bg-purple-950/40 border border-purple-500/50 rounded text-center text-xs text-purple-300 font-semibold shadow-inner flex items-center gap-1.5";
+                    relicDiv.innerHTML = `<span>${relic.icon}</span> <span>${relic.title}</span>`;
+                    relicsContainer.appendChild(relicDiv);
+                });
             }
 
             checkVictoryConditions();
@@ -249,17 +305,16 @@
             const entry = document.createElement('div');
             entry.className = colorClass;
             entry.innerHTML = `[Chronique] ${msg}`;
-            logBox.appendChild(entry);
-            logBox.scrollTop = logBox.scrollHeight;
+            document.getElementById('log-box').appendChild(entry);
+            document.getElementById('log-box').scrollTop = document.getElementById('log-box').scrollHeight;
         }
 
         function playAction(actionType) {
             if (isGameOver) return;
-            
             let cost = (actionType === 'search' || actionType === 'campaign') ? 2 : 1;
 
             if (player.reserve < cost) {
-                addLog(`⚠️ Action impossible : Pas assez de points de Réserve (${cost} 🔹 requis).`, "text-amber-500 font-semibold");
+                addLog(`⚠️ Réserve insuffisante (${cost} 🔹 requis).`, "text-amber-500 font-semibold");
                 return;
             }
 
@@ -267,37 +322,33 @@
                 case 'travel':
                     player.location = (player.location + 1) % 3;
                     player.reserve -= cost;
-                    addLog(`🧭 Vous voyagez vers : <strong>${regions[player.location].name}</strong>.`, "text-cyan-300");
+                    addLog(`🧭 Déplacement : Vous voyagez vers les terres de : ${regions[player.location].name}.`);
+                    triggerVisualResult("🧭", "Voyage accompli", `Vous avez déplacé votre armée vers <strong>${regions[player.location].name}</strong>.<br><span class="text-xs text-cyan-400">-1 Point de Réserve</span>`);
                     break;
 
                 case 'search':
                     player.reserve -= cost;
-                    let searchDice = Math.random();
-                    if(searchDice < 0.35) {
-                        player.secrets += 1;
-                        addLog("🔍 Chercher : Vous déterrez des parchemins cryptiques dans des ruines oubliées (+1 Secret).", "text-purple-400");
-                    } else if (searchDice < 0.7) {
-                        player.favor += 2;
-                        addLog("🔍 Chercher : Les anciens clans valident vos revendications (+2 Faveurs).", "text-amber-400");
-                    } else {
-                        player.prestige += 1;
-                        addLog("🔍 Chercher : Une relique majeure accroît votre réputation de chef de guerre (+1 Prestige).", "text-emerald-400");
-                    }
+                    // Pioche une carte aléatoire du deck d'Oath
+                    let drawnCard = OATH_DECK[Math.floor(Math.random() * OATH_DECK.length)];
+                    inventory.cards.push(drawnCard);
+                    player.prestige += 1;
+                    
+                    addLog(`🔍 Recherche : Vous recrutez [${drawnCard.title}] comme conseiller.`, "text-amber-400");
+                    triggerVisualResult("🔍", "Nouvel Allié !", `Vous avez fouillé les ruines locales et recruté :<br><strong class="text-amber-400">${drawnCard.icon} ${drawnCard.title}</strong><br><span class="text-xs text-stone-400">${drawnCard.desc}</span><br><span class="text-xs text-emerald-400">+1 Prestige accumulé</span>`);
                     break;
 
                 case 'muster':
                     if(player.favor < 1) {
-                        addLog("❌ Recrutement impossible : Il vous faut 1 jeton Faveur (🪙) pour payer les mercenaires.", "text-red-400");
+                        addLog("❌ Recrutement impossible : Manque 1 Faveur 🪙.", "text-red-400");
                         return;
                     }
                     player.favor -= 1;
                     player.warbands += 2;
-                    // On renforce la région si le joueur la contrôle
-                    if(regions[player.location].control === "Vous") {
-                        regions[player.location].warbands += 2;
-                    }
+                    if(regions[player.location].control === "Vous") regions[player.location].warbands += 2;
                     player.reserve -= cost;
-                    addLog("🛡️ Enrôler : 1 Faveur dépensée. Vous levez 2 nouvelles bandes de guerre armées.");
+                    
+                    addLog("🛡️ Enrôlement : +2 Armées ajoutées à vos forces.");
+                    triggerVisualResult("🛡️", "Troupes Enrôlées", "Vous payez 1 Faveur aux tribus locales. En échange, <strong>2 nouvelles Bandes de guerre (👤👤)</strong> rejoignent vos rangs de rébellion.");
                     break;
 
                 case 'trade':
@@ -305,58 +356,63 @@
                         player.secrets -= 1;
                         player.favor += 2;
                         player.reserve -= cost;
-                        addLog("⚖️ Commercer : Vous vendez un Secret d'État aux banques de guilde contre +2 Faveurs.", "text-amber-300");
+                        addLog("⚖️ Commerce : Vente d'un Secret contre +2 Faveurs.");
+                        triggerVisualResult("⚖️", "Troc de Secret", "Vous partagez un secret enfoui aux marchands ambulants.<br><strong class="text-amber-400">+2 Faveurs (🪙🪙)</strong> ajoutées.");
                     } else if (player.favor >= 1) {
                         player.favor -= 1;
                         player.secrets += 1;
                         player.reserve -= cost;
-                        addLog("⚖️ Commercer : Vous soudoyez un archiviste de l'Empire pour obtenir +1 Secret.", "text-purple-300");
+                        addLog("⚖️ Commerce : Achat d'un Secret contre 1 Faveur.");
+                        triggerVisualResult("⚖️", "Espionnage Financé", "Vous achetez les services d'un éclaireur.<br><strong class="text-purple-400">+1 Secret (👁️)</strong> découvert.");
                     } else {
-                        addLog("❌ Commerce impossible : Il vous faut au moins 1 Faveur ou 1 Secret pour troquer.", "text-red-400");
+                        addLog("❌ Commerce impossible : Ressources à sec.", "text-red-400");
                     }
                     break;
 
                 case 'recover':
-                    // Vérification des conditions des deux bannières d'Oath
                     if (player.favor >= 4 && banners.favor !== "Vous") {
                         banners.favor = "Vous";
                         player.prestige += 2;
                         player.reserve -= cost;
-                        addLog("👑 Récupérer : Le peuple s'allie à vous ! Vous revendiquez la Bannière de la Faveur du Peuple (+2 Prestige).", "text-emerald-400 font-bold");
+                        inventory.relics.push({ title: "Faveur du Peuple", icon: "👑" });
+                        addLog("👑 Récupération : Vous possédez la Faveur du Peuple !", "text-emerald-400");
+                        triggerVisualResult("👑", "Bannière Capturée !", "Le peuple vous acclame ! Vous sécurisez la <strong>Bannière de la Faveur du Peuple</strong>.<br><span class="text-emerald-400">+2 Prestige</span>");
                     } else if (player.secrets >= 2 && banners.secret !== "Vous") {
                         banners.secret = "Vous";
                         player.prestige += 2;
                         player.reserve -= cost;
-                        addLog("👁️ Récupérer : Vos espions volent la Bannière du plus Sombre Secret ! (+2 Prestige).", "text-purple-400 font-bold");
+                        inventory.relics.push({ title: "Plus Sombre Secret", icon: "👁️" });
+                        addLog("👁️ Récupération : Le Plus Sombre Secret est à vous.", "text-purple-400");
+                        triggerVisualResult("👁️", "Secret Suprême Volé", "Vos complots payent ! Vous arrachez la <strong>Bannière du plus Sombre Secret</strong> cachée par le Prince.<br><span class="text-purple-400">+2 Prestige</span>");
                     } else {
-                        addLog("❌ Récupération échouée : Pour arracher une Bannière, vous devez posséder soit 4 Faveurs (🪙) soit 2 Secrets (👁️).", "text-stone-400");
+                        // Si pas de bannière, on simule la découverte d'une relique mineure pour ne pas bloquer le bouton
+                        player.secrets -= 1;
+                        player.prestige += 1;
+                        player.reserve -= cost;
+                        inventory.relics.push({ title: "Joyau Ancien", icon: "💎" });
+                        addLog("💎 Récupération : Vous déterrez une relique mineure abandonnée.");
+                        triggerVisualResult("💎", "Relique Découverte", "Vous n'avez pas assez pour les bannières majeures, mais vous récupérez un <strong>Joyau Ancien</strong> poussiéreux sur le site.<br><span class="text-emerald-400">+1 Prestige</span>");
                     }
                     break;
 
                 case 'campaign':
-                    if (regions[player.location].control === "Vous") {
-                        addLog("❌ Campagne inutile : Vos armées tiennent déjà solidement cette région.", "text-stone-500");
-                        return;
-                    }
-                    if (player.warbands < 1) {
-                        addLog("❌ Assaut annulé : Vos lignes d'attaque sont vides (0 Armée). Enrôlez des troupes d'abord.", "text-red-400");
-                        return;
-                    }
+                    if (regions[player.location].control === "Vous") return;
+                    if (player.warbands < 1) return;
                     player.reserve -= cost;
                     
                     let attackRoll = Math.floor(Math.random() * 6) + 1 + player.warbands;
                     let defenseRoll = Math.floor(Math.random() * 5) + 1 + regions[player.location].warbands;
                     
-                    addLog(`⚔️ <strong>CAMPAGNE :</strong> Assaut sur ${regions[player.location].name}. Force offensive : ${attackRoll} ⚔️ | Force défensive du Prince : ${defenseRoll} 🛡️`);
-                    
                     if(attackRoll >= defenseRoll) {
                         regions[player.location].control = "Vous";
-                        regions[player.location].warbands = Math.max(1, player.warbands);
+                        regions[player.location].warbands = player.warbands;
                         player.prestige += 3;
-                        addLog(`🏆 Conquête ! La garnison du Prince Mécanique est balayée. Vous régnez sur ${regions[player.location].name}. (+3 Prestige)`, "text-emerald-400 font-bold");
+                        addLog(`🏆 Guerre : Conquête réussie sur ${regions[player.location].name} !`, "text-emerald-400 font-bold");
+                        triggerVisualResult("⚔️", "Victoire Militaire !", `Vos forces écrasent l'armée impériale (Assaut ${attackRoll} vs Défense ${defenseRoll}).<br>Vous prenez le contrôle de la région : <strong>${regions[player.location].name}</strong>.<br><span class="text-emerald-400">+3 Prestige</span>`);
                     } else {
                         player.warbands = Math.max(0, player.warbands - 2);
-                        addLog("💥 Défaite ! Vos troupes se brisent face aux murs fortifiés de l'Empire. Vous perdez 2 armées.", "text-red-400");
+                        addLog("💥 Guerre : Échec de l'assaut contre le Prince.", "text-red-400");
+                        triggerVisualResult("💥", "Offensive Repoussée", `Vos troupes se heurtent à un mur d'acier (Assaut ${attackRoll} vs Défense ${defenseRoll}).<br>Votre rébellion subit de lourdes pertes : <strong class="text-red-400">-2 Armées</strong>.`);
                     }
                     break;
             }
@@ -365,45 +421,31 @@
 
         function endTurn() {
             if (isGameOver) return;
-            
-            addLog("⚙️ <strong>Tour du Prince Mécanique...</strong>", "text-red-400");
+            addLog("⚙️ Tour du Prince Mécanique...", "text-red-400");
             
             setTimeout(() => {
                 let event = Math.random();
-                if(event < 0.45) {
+                if(event < 0.5) {
                     bot.threat += 1;
-                    addLog("⚙️ L'Automate étend sa bureaucratie de fer. Le niveau de Menace globale augmente (+1 Menace).", "text-red-300");
-                } else if(event < 0.8) {
-                    for(let i=0; i<3; i++) {
-                        if(regions[i].control === "Prince") regions[i].warbands += 1;
-                    }
-                    addLog("⚙️ Des usines de l'Ombre déploient de nouvelles sentinelles robotiques sur les garnisons ennemies (+1 Garde).");
+                    addLog("⚙️ L'Automate fortifie ses verrous industriels. (+1 Menace).", "text-red-300");
                 } else {
-                    if (banners.favor === "Vous") {
-                        banners.favor = "Prince";
-                        player.prestige = Math.max(0, player.prestige - 2);
-                        addLog("⚙️ Les agents du Prince manipulent le marché. Vous perdez la Faveur du Peuple (-2 Prestige).", "text-red-400");
-                    } else {
-                        bot.threat += 1;
-                        addLog("⚙️ Le Prince solidifie ses forges impériales (+1 Menace).");
-                    }
+                    for(let i=0; i<3; i++) { if(regions[i].control === "Prince") regions[i].warbands += 1; }
+                    addLog("⚙️ Le Prince déploie de nouvelles patrouilles de gardes de fer.");
                 }
-
                 player.reserve = 6;
-                addLog("✨ Début de votre tour. Réserve restaurée à 6 🔹. Planifiez vos conquêtes !", "text-cyan-400 font-bold");
+                addLog("✨ Début de votre tour. Vos 6 🔹 de Réserve sont rechargés !", "text-cyan-400 font-bold");
                 updateUI();
             }, 500);
         }
 
         function checkVictoryConditions() {
             let ownedRegions = regions.filter(r => r.control === "Vous").length;
-            
             if (player.prestige >= 10 || ownedRegions === 3) {
                 isGameOver = true;
-                showEndScreen("VICTOIRE DE L'EXILÉ ! Vous avez accompli votre Serment, brisé le Prince Mécanique et instauré un nouvel Âge de liberté dans la Chronique !", "bg-emerald-950/90 border-emerald-500 text-emerald-400");
+                showEndScreen("VICTOIRE DE L'EXILÉ ! Le Serment est rempli, l'Empire mécanique s'effondre !", "bg-emerald-950/90 border-emerald-500 text-emerald-400");
             } else if (bot.threat >= 6) {
                 isGameOver = true;
-                showEndScreen("DÉFAITE... L'Empire tombe sous une nuit métallique éternelle. Votre nom est banni de la mémoire du monde.", "bg-red-950/90 border-red-500 text-red-400");
+                showEndScreen("DÉFAITE... Le Prince a totalement annihilé la lueur de la rébellion.", "bg-red-950/90 border-red-500 text-red-400");
             }
         }
 
@@ -412,10 +454,8 @@
             modal.className = `fixed inset-0 flex flex-col items-center justify-center p-6 ${cssClasses} border-4 z-50 rounded-2xl max-w-xl h-fit m-auto text-center shadow-2xl backdrop-blur-md`;
             modal.innerHTML = `
                 <h3 class="font-oath text-2xl font-bold mb-4">Fin de la Chronique</h3>
-                <p class="text-sm leading-relaxed mb-6">${msg}</p>
-                <button onclick="window.location.reload()" class="bg-stone-800 text-stone-200 border border-stone-600 px-6 py-2 rounded-lg font-oath tracking-wide uppercase text-xs hover:bg-stone-700 cursor-pointer">
-                    Lancer une nouvelle Chronique
-                </button>
+                <p class="text-sm mb-6">${msg}</p>
+                <button onclick="window.location.reload()" class="bg-stone-800 text-stone-200 border border-stone-600 px-6 py-2 rounded-lg font-oath tracking-wide uppercase text-xs hover:bg-stone-700 cursor-pointer">Lancer une nouvelle Chronique</button>
             `;
             document.body.appendChild(modal);
         }
