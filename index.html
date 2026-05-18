@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serment - Chroniques d'Empire et d'Exil</title>
+    <!-- Chargement de Tailwind CSS pour un design moderne et médiéval -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=MedievalSharp&family=URW+Chancery&display=swap');
+        body {
+            background-color: #120f0c;
+            background-image: radial-gradient(rgba(30, 24, 18, 0.8), rgba(10, 8, 6, 1));
+            color: #f2e6ce;
+            font-family: 'Georgia', serif;
+        }
+        .titre-medieval {
+            font-family: 'Cinzel', serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-4 md:p-8">
+
+    <!-- En-tête -->
+    <header class="text-center my-4">
+        <h1 class="titre-medieval text-4xl md:text-6xl font-bold tracking-wider text-amber-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+            SERMENT
+        </h1>
+        <p class="text-xs md:text-sm uppercase tracking-widest text-amber-200/60 mt-1">
+            Chroniques d'Empire et d'Exil — Module Relique
+        </p>
+    </header>
+
+    <!-- Zone principale du jeu -->
+    <main class="w-full max-w-4xl bg-amber-950/20 border border-amber-900/40 rounded-xl p-4 md:p-6 shadow-2xl backdrop-blur-xs flex flex-col gap-6">
+        
+        <!-- Grille des Scores / Status -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- CAMP DU JOUEUR (L'EXILÉ / LE CHANCELIER) -->
+            <div class="bg-stone-900/80 border-l-4 border-amber-500 rounded-r-lg p-4 shadow-md">
+                <h2 class="titre-medieval text-xl font-bold text-amber-400 border-b border-stone-700 pb-2 mb-3 flex justify-between">
+                    <span>Votre Camp</span>
+                    <span id="player-role" class="text-xs bg-amber-900/50 text-amber-200 px-2 py-0.5 rounded border border-amber-700/40">Exilé</span>
+                </h2>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div class="bg-stone-950/60 p-2 rounded border border-stone-800">
+                        <span class="block text-stone-400 text-xs uppercase">⚔️ Armées</span>
+                        <strong id="p-warbands" class="text-xl text-amber-100">4</strong>
+                    </div>
+                    <div class="bg-stone-950/60 p-2 rounded border border-stone-800">
+                        <span class="block text-stone-400 text-xs uppercase">✨ Faveur</span>
+                        <strong id="p-favor" class="text-xl text-amber-100">2</strong>
+                    </div>
+                    <div class="bg-stone-950/60 p-2 rounded border border-stone-800">
+                        <span class="block text-stone-400 text-xs uppercase">👁️ Secrets</span>
+                        <strong id="p-secrets" class="text-xl text-amber-100">1</strong>
+                    </div>
+                    <div class="bg-stone-950/60 p-2 rounded border border-stone-800">
+                        <span class="block text-stone-400 text-xs uppercase">🏆 Prestige</span>
+                        <strong id="p-prestige" class="text-xl text-amber-400">0 / 10</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LE PRINCE MÉCANIQUE (L'AUTOMATE) -->
+            <div class="bg-stone-900/80 border-r-4 border-red-700 rounded-l-lg p-4 shadow-md">
+                <h2 class="titre-medieval text-xl font-bold text-red-400 border-b border-stone-700 pb-2 mb-3 flex justify-between">
+                    <span>Prince Mécanique</span>
+                    <span class="text-xs bg-red-950/60 text-red-300 px-2 py-0.5 rounded border border-red-900/40 animate-pulse">⚙️ En Marche</span>
+                </h2>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div class="bg-stone-950/60 p-2 rounded border border-stone-800">
+                        <span class="block text-stone-400 text-xs uppercase">🤖 Armées Gardiennes</span>
+                        <strong id="b-warbands" class="text-xl text-red-200">6</strong>
+                    </div>
+                    <div class="bg-stone-950/60 p-2 rounded border border-stone-800">
+                        <span class="block text-stone-400 text-xs uppercase">🏰 Sites Contrôlés</span>
+                        <strong id="b-sites" class="text-xl text-red-200">3</strong>
+                    </div>
+                    <div class="bg-stone-950/60 p-2 rounded border border-stone-800">
+                        <span class="block text-stone-400 text-xs uppercase">⚡ Corruption</span>
+                        <strong id="b-threat" class="text-xl text-red-400">1 / 6</strong>
+                    </div>
+                    <div class="bg-stone-950/60 p-2 rounded border border-stone-800">
+                        <span class="block text-stone-400 text-xs uppercase">Vision Actuelle</span>
+                        <strong class="text-xs text-red-300 italic block mt-1">Suprématie de Fer</strong>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Zone d'Action -->
+        <div id="actions-panel" class="bg-stone-900/40 border border-stone-800 rounded-lg p-4">
+            <h3 class="text-sm font-semibold text-stone-400 uppercase tracking-wider mb-3">Choisir une action pour ce tour :</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <button onclick="actionMuster()" class="bg-amber-800 hover:bg-amber-700 text-amber-100 font-medium py-3 px-4 rounded shadow border border-amber-600 transition-all cursor-pointer text-sm">
+                    🛡️ Enrôler de la populace<br>
+                    <span class="text-xs text-amber-300/80">(Coûte 1 Faveur → +2 Armées)</span>
+                </button>
+                <button onclick="actionSearch()" class="bg-amber-800 hover:bg-amber-700 text-amber-100 font-medium py-3 px-4 rounded shadow border border-amber-600 transition-all cursor-pointer text-sm">
+                    🔍 Fouiller les Ruines<br>
+                    <span class="text-xs text-amber-300/80">(Coûte 1 Secret → Gain aléatoire)</span>
+                </button>
+                <button onclick="actionCampaign()" class="bg-red-900 hover:bg-red-800 text-red-100 font-bold py-3 px-4 rounded shadow border border-red-700 transition-all cursor-pointer text-sm">
+                    ⚔️ Lancer une Campagne<br>
+                    <span class="text-xs text-red-300/80">(Bataille de dés vs le Prince)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Historique de la Chronique -->
+        <div class="flex flex-col flex-1">
+            <h3 class="text-sm font-semibold text-stone-400 uppercase tracking-wider mb-2">Chronique des Événements :</h3>
+            <div id="log-box" class="bg-black/60 border border-stone-800 rounded-lg p-3 h-40 overflow-y-auto text-xs md:text-sm font-mono space-y-1.5 scrollbar-thin text-stone-300">
+                <div class="text-amber-400/80">[Chronique] Vous arrivez aux frontières de l'Ancien Empire. Le Prince Mécanique domine les terres. Votre Serment doit être accompli.</div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Pied de page -->
+    <footer class="text-center text-xs text-stone-600 my-4">
+        Inspiré de l'univers de OATH par Leder Games. Propulsé par GitHub Pages.
+    </footer>
+
+    <!-- Logique JavaScript du Jeu -->
+    <script>
+        // État initial
+        let player = { warbands: 4, favor: 2, secrets: 1, prestige: 0 };
+        let bot = { warbands: 6, sites: 3, threat: 1 };
+        let gameOver = false;
+
+        const logBox = document.getElementById('log-box');
+
+        function updateUI() {
+            document.getElementById('p-warbands').innerText = player.warbands;
+            document.getElementById('p-favor').innerText = player.favor;
+            document.getElementById('p-secrets').innerText = player.secrets;
+            document.getElementById('p-prestige').innerText = `${player.prestige} / 10`;
+
+            document.getElementById('b-warbands').innerText = bot.warbands;
+            document.getElementById('b-sites').innerText = bot.sites;
+            document.getElementById('b-threat').innerText = `${bot.threat} / 6`;
+
+            // Vérification des conditions de victoire/défaite
+            checkEndConditions();
+        }
+
+        function addLog(message, type = 'info') {
+            const colors = {
+                info: 'text-stone-300',
+                success: 'text-emerald-400 font-semibold',
+                danger: 'text-red-400 font-semibold',
+                warning: 'text-amber-400'
+            };
+            const div = document.createElement('div');
+            div.className = colors[type] || colors.info;
+            div.innerHTML = `[Chronique] ${message}`;
+            logBox.appendChild(div);
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        // ACTION : Enrôler
+        function actionMuster() {
+            if (gameOver) return;
+            if (player.favor < 1) {
+                addLog("Vous n'avez pas assez de Faveur pour corrompre ou convaincre les locaux.", "warning");
+                return;
+            }
+            player.favor -= 1;
+            player.warbands += 2;
+            addLog("Vous dépensez 1 Faveur auprès du Peuple et levez 2 nouvelles Armées.", "info");
+            updateUI();
+            if (!gameOver) setTimeout(botTurn, 800);
+        }
+
+        // ACTION : Fouiller
+        function actionSearch() {
+            if (gameOver) return;
+            if (player.secrets < 1) {
+                addLog("Il vous manque des Secrets de l'Ancien Monde pour déchiffrer les ruines.", "warning");
+                return;
+            }
+            player.secrets -= 1;
+            
+            // Gain aléatoire
+            const rand = Math.random();
+            if (rand < 0.4) {
+                player.favor += 3;
+                addLog("Dans les cryptes, vous découvrez une Relique perdue ! (+3 Faveurs)", "success");
+            } else if (rand < 0.8) {
+                player.warbands += 1;
+                player.secrets += 1;
+                addLog("Vous trouvez de vieux plans tactiques et ralliez un éclaireur. (+1 Armée, +1 Secret reconstitué)", "info");
+            } else {
+                player.prestige += 2;
+                addLog("Vous accomplissez un exploit légendaire gravé sur les stèles ! (+2 Prestige)", "success");
+            }
+            updateUI();
+            if (!gameOver) setTimeout(botTurn, 800);
+        }
+
+        // ACTION : Campagne (Attaque)
+        function actionCampaign() {
+            if (gameOver) return;
+            if (player.warbands < 1) {
+                addLog("Vous ne pouvez pas mener d'assaut sans armées à sacrifier !", "warning");
+                return;
+            }
+
+            addLog("⚔️ Vous lancez vos forces à l'assaut des bastions mécaniques !", "warning");
+
+            // Calcul des forces (Dés simulés)
+            let playerRoll = 0;
+            const diceToRoll = Math.min(player.warbands, 3);
+            for(let i=0; i<diceToRoll; i++) {
+                playerRoll += Math.floor(Math.random() * 6) + 1;
+            }
+            
+            let botDefense = bot.warbands + Math.floor(Math.random() * 4);
+
+            addLog(`Vos éclaireurs annoncent une force d'attaque de ${playerRoll} (via ${diceToRoll} dés) face à une défense de ${botDefense}.`);
+
+            if (playerRoll > botDefense) {
+                // Victoire
+                bot.warbands = Math.max(0, bot.warbands - 2);
+                bot.sites = Math.max(0, bot.sites - 1);
+                player.prestige += 3;
+                addLog("🏆 Victoire éclatante ! Un site du Prince tombe entre vos mains. Ses engrenages cèdent.", "success");
+            } else {
+                // Défaite / Retraite
+                player.warbands = Math.max(0, player.warbands - 2);
+                player.secrets += 1;
+                addLog("❌ Vos troupes s'écrasent contre ses murs de fer. Vos armées subissent de lourdes pertes, mais vous apprenez de vos erreurs (+1 Secret).", "danger");
+            }
+
+            updateUI();
+            if (!gameOver) setTimeout(botTurn, 1000);
+        }
+
+        // TOUR DU PRINCE MÉCANIQUE
+        function botTurn() {
+            if (gameOver) return;
+
+            addLog("⚙️ Le Prince Mécanique s'active au centre du monde...", "info");
+            
+            const rand = Math.random();
+            if (rand < 0.4) {
+                bot.warbands += 2;
+                addLog("Le Prince produit des vagues d'automates d'acier depuis ses forges. (+2 Armées Gardiennes)", "danger");
+            } else if (rand < 0.7) {
+                bot.threat += 1;
+                addLog("La corruption mécanique s'étend. Le Prince solidifie son emprise. (+1 Corruption)", "danger");
+            } else {
+                if (player.warbands > 0) {
+                    player.warbands = Math.max(0, player.warbands - 1);
+                    addLog("Une patrouille du Prince tend une embuscade à vos arrières-gardes. (-1 Armée)", "danger");
+                } else {
+                    bot.threat += 1;
+                    addLog("Le Prince ne trouvant aucune résistance érige une nouvelle idole de fer. (+1 Corruption)", "danger");
+                }
+            }
+
+            // Chaque tour donne passivement un peu d'opportunité au joueur s'il survit
+            player.secrets += 1;
+            addLog("Le temps passe. Le réseau de vos espions intercepte de nouvelles rumeurs (+1 Secret).");
+
+            updateUI();
+        }
+
+        // Conditions de fin
+        function checkEndConditions() {
+            if (player.prestige >= 10 || bot.sites === 0) {
+                endGame("FÉLICITATIONS ! Vous avez brisé le joug du Prince Mécanique et inscrit votre nom dans la Chronique de cet Empire !", "success");
+            } else if (bot.threat >= 6) {
+                endGame("DÉFAITE... L'Empire est totalement mécanisé et verrouillé à jamais par l'Automate. Votre Serment est brisé.", "danger");
+            } else if (player.warbands === 0 && player.favor === 0 && player.secrets === 0) {
+                endGame("DÉFAITE... Vous êtes démuni de ressources, d'armées et de soutiens. Vous disparaissez dans l'oubli des exilés.", "danger");
+            }
+        }
+
+        function endGame(message, type) {
+            gameOver = true;
+            addLog(`🚨 ${message}`, type);
+            // Griser le panneau d'action
+            document.getElementById('actions-panel').innerHTML = `
+                <div class="text-center py-4">
+                    <p class="text-lg font-bold ${type === 'success' ? 'text-emerald-400' : 'text-red-400'}">${message}</p>
+                    <button onclick="window.location.reload()" class="mt-4 bg-stone-800 hover:bg-stone-700 text-stone-200 px-4 py-2 rounded text-xs tracking-wider uppercase border border-stone-600 cursor-pointer">
+                        Recommencer une Chronique
+                    </button>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
