@@ -18,7 +18,6 @@
         .font-oath { font-family: 'Cinzel', serif; }
         .font-card { font-family: 'IM Fell English SC', serif; }
         
-        /* Personnalisation de la barre de défilement pour le log */
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
         .custom-scroll::-webkit-scrollbar-thumb { background: #78350f; border-radius: 2px; }
@@ -142,9 +141,7 @@
             <!-- PISTE DE RÉSERVE (6 JETONS) -->
             <div class="flex items-center gap-2 bg-stone-950 p-1.5 rounded-lg border border-stone-800 shadow-inner">
                 <span class="text-[10px] font-bold uppercase tracking-widest text-stone-500 mr-1">Réserve (Action Points) :</span>
-                <div class="flex gap-1" id="reserve-track">
-                    <!-- Généré dynamiquement en JS (6 ronds bleus/vides) -->
-                </div>
+                <div class="flex gap-1" id="reserve-track"></div>
             </div>
         </div>
 
@@ -175,14 +172,14 @@
             <button onclick="playAction('trade')" class="bg-stone-900 border border-stone-700/60 rounded-lg p-2 text-center transition-all hover:bg-stone-800 active:scale-95 group cursor-pointer">
                 <div class="text-xs font-bold text-amber-500 uppercase tracking-wide group-hover:text-amber-400">⚖️ Commercer</div>
                 <div class="text-[10px] text-cyan-400 my-1 font-mono">Coût : 1 🔹</div>
-                <div class="text-[11px] text-stone-400 leading-tight">Troc local. Convertir 1 Secret en +2 Faveurs ou inversement.</div>
+                <div class="text-[11px] text-stone-400 leading-tight">Convertir 1 Secret en 2 Faveurs (ou inversement si Faveur dispo).</div>
             </button>
 
             <!-- ACTION 5: RÉCUPÉRER -->
             <button onclick="playAction('recover')" class="bg-stone-900 border border-stone-700/60 rounded-lg p-2 text-center transition-all hover:bg-stone-800 active:scale-95 group cursor-pointer">
                 <div class="text-xs font-bold text-amber-500 uppercase tracking-wide group-hover:text-amber-400">👑 Récupérer</div>
                 <div class="text-[10px] text-cyan-400 my-1 font-mono">Coût : 1 🔹</div>
-                <div class="text-[11px] text-stone-400 leading-tight">Prendre le contrôle d'une Bannière si conditions requises.</div>
+                <div class="text-[11px] text-stone-400 leading-tight">Revendiquer une Bannière (Requis: 4 Faveurs ou 2 Secrets).</div>
             </button>
 
             <!-- ACTION 6: CAMPAGNE -->
@@ -194,9 +191,8 @@
         </div>
     </footer>
 
-    <!-- LOGIQUE LOGICIELLE DE L'ENGINE DE JEU -->
+    <!-- LOGIQUE LOGICIELLE FIXÉE ET VÉRIFIÉE -->
     <script>
-        // Moteur d'état du Clone d'Oath
         let player = { reserve: 6, warbands: 3, favor: 2, secrets: 1, prestige: 1, location: 2 };
         let bot = { threat: 3 };
         let regions = [
@@ -209,44 +205,35 @@
 
         const logBox = document.getElementById('log-box');
 
-        // Initialisation de l'affichage
         function updateUI() {
-            // Devises du Joueur
             document.getElementById('p-warbands').innerText = player.warbands;
             document.getElementById('p-favor').innerText = player.favor;
             document.getElementById('p-secrets').innerText = player.secrets;
             document.getElementById('p-prestige').innerText = `${player.prestige} / 10`;
             document.getElementById('player-pos-text').innerText = regions[player.location].name;
 
-            // Bannières
             document.getElementById('holder-favor').innerText = banners.favor;
             document.getElementById('holder-secret').innerText = banners.secret;
 
-            // Piste du Bot (Menace)
             let threatStr = "";
             for (let i = 1; i <= 6; i++) {
                 threatStr += i <= bot.threat ? "⚙️ " : "░ ";
             }
             document.getElementById('bot-threat-track').innerText = `${threatStr} (${bot.threat}/6)`;
 
-            // Régions sur la table de jeu
             for(let i=0; i<3; i++) {
                 document.getElementById(`reg-control-${i}`).innerText = regions[i].control === "Vous" ? "Vous (Exilé)" : "Prince";
                 document.getElementById(`reg-control-${i}`).className = regions[i].control === "Vous" ? "text-emerald-400 font-bold text-sm" : "text-red-400 font-bold text-sm";
                 document.getElementById(`reg-warbands-${i}`).innerText = `${regions[i].warbands} 👤`;
                 
-                // Mettre en surbrillance la région où se trouve physiquement le joueur
                 let regElement = document.getElementById(`region-${i}`);
                 if(player.location === i) {
-                    regElement.style.borderColor = "#f59e0b"; // Bordure dorée brillante
-                    regElement.style.boxShadow = "0 0 15px rgba(245, 158, 11, 0.2)";
+                    regElement.className = regElement.className.replace(/border-stone-700\/60|border-amber-500\/50/g, '') + " border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.3)]";
                 } else {
-                    regElement.style.borderColor = "rgba(120, 113, 108, 0.4)";
-                    regElement.style.boxShadow = "none";
+                    regElement.className = regElement.className.replace(/border-amber-500|shadow-\[.*\]/g, '') + " border-stone-700/60";
                 }
             }
 
-            // Génération de la piste visuelle de Réserve (les 6 jetons)
             const reserveTrack = document.getElementById('reserve-track');
             reserveTrack.innerHTML = "";
             for (let i = 1; i <= 6; i++) {
@@ -266,170 +253,157 @@
             logBox.scrollTop = logBox.scrollHeight;
         }
 
-        // Système d'action lié aux points de Réserve
         function playAction(actionType) {
             if (isGameOver) return;
             
-            // Gestion des coûts en réserve
-            let cost = 1;
-            if (actionType === 'search' || actionType === 'campaign') cost = 2;
+            let cost = (actionType === 'search' || actionType === 'campaign') ? 2 : 1;
 
             if (player.reserve < cost) {
-                addLog(`⚠️ Pas assez de points de Réserve pour cette action (${cost} 🔹 requis). Terminez votre tour.`, "text-amber-500");
+                addLog(`⚠️ Action impossible : Pas assez de points de Réserve (${cost} 🔹 requis).`, "text-amber-500 font-semibold");
                 return;
             }
 
-            // Exécution de l'action selon les règles d'Oath
             switch(actionType) {
                 case 'travel':
-                    // Cycle entre les 3 régions disponibles
                     player.location = (player.location + 1) % 3;
                     player.reserve -= cost;
-                    addLog(`🧭 Vous voyagez vers : <strong>${regions[player.location].name}</strong>.`);
+                    addLog(`🧭 Vous voyagez vers : <strong>${regions[player.location].name}</strong>.`, "text-cyan-300");
                     break;
 
                 case 'search':
                     player.reserve -= cost;
-                    let dice = Math.random();
-                    if(dice < 0.35) {
+                    let searchDice = Math.random();
+                    if(searchDice < 0.35) {
                         player.secrets += 1;
-                        addLog("🔍 Fouille : Vous découvrez un manuscrit interdit dans les ruines (+1 Secret).", "text-purple-400");
-                    } else if (dice < 0.7) {
-                        player.favor += 1;
-                        addLog("🔍 Fouille : Une guilde locale décide de financer vos ambitions (+1 Faveur).", "text-amber-400");
+                        addLog("🔍 Chercher : Vous déterrez des parchemins cryptiques dans des ruines oubliées (+1 Secret).", "text-purple-400");
+                    } else if (searchDice < 0.7) {
+                        player.favor += 2;
+                        addLog("🔍 Chercher : Les anciens clans valident vos revendications (+2 Faveurs).", "text-amber-400");
                     } else {
                         player.prestige += 1;
-                        addLog("🔍 Fouille : Vous trouvez un héritage perdu, augmentant votre légitimité (+1 Prestige).", "text-emerald-400");
+                        addLog("🔍 Chercher : Une relique majeure accroît votre réputation de chef de guerre (+1 Prestige).", "text-emerald-400");
                     }
                     break;
 
                 case 'muster':
                     if(player.favor < 1) {
-                        addLog("❌ Il vous faut au moins 1 point de Faveur pour recruter la populace.", "text-red-400");
+                        addLog("❌ Recrutement impossible : Il vous faut 1 jeton Faveur (🪙) pour payer les mercenaires.", "text-red-400");
                         return;
                     }
                     player.favor -= 1;
                     player.warbands += 2;
-                    regions[player.location].warbands += 2; // S'ajoute à la garnison locale
+                    // On renforce la région si le joueur la contrôle
+                    if(regions[player.location].control === "Vous") {
+                        regions[player.location].warbands += 2;
+                    }
                     player.reserve -= cost;
-                    addLog("🛡️ Enrôler : Vous payez 1 Faveur. +2 Armées ajoutées à vos forces locales.");
+                    addLog("🛡️ Enrôler : 1 Faveur dépensée. Vous levez 2 nouvelles bandes de guerre armées.");
                     break;
 
                 case 'trade':
-                    player.reserve -= cost;
-                    if(player.secrets >= 1) {
+                    if (player.secrets >= 1) {
                         player.secrets -= 1;
                         player.favor += 2;
-                        addLog("⚖️ Commerce : Vous vendez un Secret ancien à une guilde marchande contre +2 Faveurs.");
-                    } else if(player.favor >= 1) {
+                        player.reserve -= cost;
+                        addLog("⚖️ Commercer : Vous vendez un Secret d'État aux banques de guilde contre +2 Faveurs.", "text-amber-300");
+                    } else if (player.favor >= 1) {
                         player.favor -= 1;
                         player.secrets += 1;
-                        addLog("⚖️ Commerce : Vous achetez des documents cryptés à un espion (+1 Secret).");
+                        player.reserve -= cost;
+                        addLog("⚖️ Commercer : Vous soudoyez un archiviste de l'Empire pour obtenir +1 Secret.", "text-purple-300");
                     } else {
-                        addLog("❌ Vous n'avez aucune ressource à échanger.", "text-red-400");
-                        player.reserve += cost; // Remboursement
+                        addLog("❌ Commerce impossible : Il vous faut au moins 1 Faveur ou 1 Secret pour troquer.", "text-red-400");
                     }
                     break;
 
                 case 'recover':
-                    player.reserve -= cost;
-                    if(player.favor >= 4 && banners.favor !== "Vous") {
+                    // Vérification des conditions des deux bannières d'Oath
+                    if (player.favor >= 4 && banners.favor !== "Vous") {
                         banners.favor = "Vous";
                         player.prestige += 2;
-                        addLog("👑 Récupérer : La Bannière de la Faveur du Peuple vous revient ! (+2 Prestige)", "text-emerald-400");
-                    } else if(player.secrets >= 2 && banners.secret !== "Vous") {
+                        player.reserve -= cost;
+                        addLog("👑 Récupérer : Le peuple s'allie à vous ! Vous revendiquez la Bannière de la Faveur du Peuple (+2 Prestige).", "text-emerald-400 font-bold");
+                    } else if (player.secrets >= 2 && banners.secret !== "Vous") {
                         banners.secret = "Vous";
                         player.prestige += 2;
-                        addLog("👁️ Récupérer : Vous dérobez la Bannière du plus Sombre Secret ! (+2 Prestige)", "text-purple-400");
+                        player.reserve -= cost;
+                        addLog("👁️ Récupérer : Vos espions volent la Bannière du plus Sombre Secret ! (+2 Prestige).", "text-purple-400 font-bold");
                     } else {
-                        addLog("❌ Conditions insuffisantes. Pour voler la Faveur, il vous faut 4 🪙. Pour le Secret, il vous faut 2 👁️.", "text-stone-500");
-                        player.reserve += cost;
+                        addLog("❌ Récupération échouée : Pour arracher une Bannière, vous devez posséder soit 4 Faveurs (🪙) soit 2 Secrets (👁️).", "text-stone-400");
                     }
                     break;
 
                 case 'campaign':
                     if (regions[player.location].control === "Vous") {
-                        addLog("❌ Vous contrôlez déjà cette région. Inutile de mener une campagne ici.", "text-stone-500");
+                        addLog("❌ Campagne inutile : Vos armées tiennent déjà solidement cette région.", "text-stone-500");
                         return;
                     }
                     if (player.warbands < 1) {
-                        addLog("❌ Vous n'avez aucune troupe disponible pour mener l'assaut.", "text-red-400");
+                        addLog("❌ Assaut annulé : Vos lignes d'attaque sont vides (0 Armée). Enrôlez des troupes d'abord.", "text-red-400");
                         return;
                     }
                     player.reserve -= cost;
                     
-                    // Simulation du combat d'OATH (Jet de dés Attaquant vs Défenseur)
-                    let attackRoll = Math.floor(Math.random() * 5) + player.warbands;
-                    let defenseRoll = Math.floor(Math.random() * 4) + regions[player.location].warbands;
+                    let attackRoll = Math.floor(Math.random() * 6) + 1 + player.warbands;
+                    let defenseRoll = Math.floor(Math.random() * 5) + 1 + regions[player.location].warbands;
                     
-                    addLog(`⚔️ <strong>BATAILLE :</strong> Vos armées frappent (Score d'Assaut: ${attackRoll}) contre les défenses automatisées (Score de Défense: ${defenseRoll}).`);
+                    addLog(`⚔️ <strong>CAMPAGNE :</strong> Assaut sur ${regions[player.location].name}. Force offensive : ${attackRoll} ⚔️ | Force défensive du Prince : ${defenseRoll} 🛡️`);
                     
                     if(attackRoll >= defenseRoll) {
                         regions[player.location].control = "Vous";
-                        regions[player.location].warbands = Math.max(1, player.warbands - 1);
+                        regions[player.location].warbands = Math.max(1, player.warbands);
                         player.prestige += 3;
-                        addLog("🏆 Victoire totale ! Les bannières du Prince Mécanique brûlent. Vous capturez le site. (+3 Prestige)", "text-emerald-400 font-bold");
+                        addLog(`🏆 Conquête ! La garnison du Prince Mécanique est balayée. Vous régnez sur ${regions[player.location].name}. (+3 Prestige)`, "text-emerald-400 font-bold");
                     } else {
                         player.warbands = Math.max(0, player.warbands - 2);
-                        regions[player.location].warbands += 1;
-                        addLog("💥 Défaite cuisante ! Vos armées s'écrasent contre le métal. (-2 Armées)", "text-red-400");
+                        addLog("💥 Défaite ! Vos troupes se brisent face aux murs fortifiés de l'Empire. Vous perdez 2 armées.", "text-red-400");
                     }
                     break;
             }
             updateUI();
         }
 
-        // FIN DE TOUR & TOUR DE L'AUTOMATE
         function endTurn() {
             if (isGameOver) return;
             
             addLog("⚙️ <strong>Tour du Prince Mécanique...</strong>", "text-red-400");
             
-            // Intelligence Artificielle de l'Automate
             setTimeout(() => {
                 let event = Math.random();
-                if(event < 0.4) {
+                if(event < 0.45) {
                     bot.threat += 1;
-                    addLog("⚙️ Le Prince fortifie ses chaînes de montage de l'Empire. La jauge de menace progresse (+1 Menace).", "text-red-300");
-                } else if(event < 0.75) {
-                    // Renforcement de la garnison la plus faible contrôlée par l'ennemi
+                    addLog("⚙️ L'Automate étend sa bureaucratie de fer. Le niveau de Menace globale augmente (+1 Menace).", "text-red-300");
+                } else if(event < 0.8) {
                     for(let i=0; i<3; i++) {
-                        if(regions[i].control === "Prince") {
-                            regions[i].warbands += 1;
-                        }
+                        if(regions[i].control === "Prince") regions[i].warbands += 1;
                     }
-                    addLog("⚙️ Des régiments d'infanterie d'acier sont déployés sur tous les bastions impériaux (+1 Garde).");
+                    addLog("⚙️ Des usines de l'Ombre déploient de nouvelles sentinelles robotiques sur les garnisons ennemies (+1 Garde).");
                 } else {
                     if (banners.favor === "Vous") {
                         banners.favor = "Prince";
                         player.prestige = Math.max(0, player.prestige - 2);
-                        addLog("⚙️ Le Prince corrompt les élites marchandes : la Bannière de la Faveur retourne à l'Empire. (-2 Prestige)", "text-red-400");
+                        addLog("⚙️ Les agents du Prince manipulent le marché. Vous perdez la Faveur du Peuple (-2 Prestige).", "text-red-400");
                     } else {
                         bot.threat += 1;
-                        addLog("⚙️ Le Prince resserre sa surveillance bureaucratique (+1 Menace).");
+                        addLog("⚙️ Le Prince solidifie ses forges impériales (+1 Menace).");
                     }
                 }
 
-                // Fin du tour du Bot, reset de la réserve de l'Exilé
                 player.reserve = 6;
-                addLog("✨ Votre réserve est rechargée. C'est à vous de jouer ! 🔹 6/6", "text-cyan-400 font-bold");
+                addLog("✨ Début de votre tour. Réserve restaurée à 6 🔹. Planifiez vos conquêtes !", "text-cyan-400 font-bold");
                 updateUI();
-            }, 600);
+            }, 500);
         }
 
-        // Vérification des conditions de victoire d'Oath
         function checkVictoryConditions() {
-            // Victoire par le Serment accompli (Prestige max ou contrôle du Royaume)
             let ownedRegions = regions.filter(r => r.control === "Vous").length;
             
             if (player.prestige >= 10 || ownedRegions === 3) {
                 isGameOver = true;
-                showEndScreen("VICTOIRE DE L'EXILÉ ! Vous avez accompli votre Serment, renversé la dynastie de fer et écrit la nouvelle page de la Chronique !", "bg-emerald-950/90 border-emerald-500 text-emerald-400");
-            } 
-            // Défaite par la Menace maximum du Bot
-            else if (bot.threat >= 6) {
+                showEndScreen("VICTOIRE DE L'EXILÉ ! Vous avez accompli votre Serment, brisé le Prince Mécanique et instauré un nouvel Âge de liberté dans la Chronique !", "bg-emerald-950/90 border-emerald-500 text-emerald-400");
+            } else if (bot.threat >= 6) {
                 isGameOver = true;
-                showEndScreen("DÉFAITE IMPÉRIALE... Le Prince Mécanique a totalement verrouillé le monde sous son règne de rouages. Votre nom s'efface de l'Histoire.", "bg-red-950/90 border-red-500 text-red-400");
+                showEndScreen("DÉFAITE... L'Empire tombe sous une nuit métallique éternelle. Votre nom est banni de la mémoire du monde.", "bg-red-950/90 border-red-500 text-red-400");
             }
         }
 
@@ -439,14 +413,13 @@
             modal.innerHTML = `
                 <h3 class="font-oath text-2xl font-bold mb-4">Fin de la Chronique</h3>
                 <p class="text-sm leading-relaxed mb-6">${msg}</p>
-                <button onclick="window.location.reload()" class="bg-stone-800 text-stone-200 border border-stone-600 px-6 py-2 rounded-lg font-oath tracking-wide uppercase text-xs hover:bg-stone-700">
-                    Recommencer une partie
+                <button onclick="window.location.reload()" class="bg-stone-800 text-stone-200 border border-stone-600 px-6 py-2 rounded-lg font-oath tracking-wide uppercase text-xs hover:bg-stone-700 cursor-pointer">
+                    Lancer une nouvelle Chronique
                 </button>
             `;
             document.body.appendChild(modal);
         }
 
-        // Démarrage initial
         updateUI();
     </script>
 </body>
