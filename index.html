@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oath - Le Tour Complet (Tablet Clone)</title>
+    <title>Oath - Le Tour Complet avec Cartes Officielles</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=IM+Fell+English+SC&display=swap');
@@ -70,47 +70,56 @@
 
     <!-- ZONE CENTRALE : LE PLATEAU DE TABLETTE -->
     <div class="flex-1 grid grid-cols-3 gap-2 min-h-0 mb-1.5">
-        <!-- LES LIEUX DU ROYAUME -->
-        <section class="col-span-2 bg-stone-900/40 border border-stone-800/80 rounded-xl p-2.5 flex flex-col justify-between gap-2 shadow-inner">
+        <!-- LES LIEUX DU ROYAUME (AVEC CRÉDITS D'IMAGES OFFICIELS) -->
+        <section class="col-span-2 bg-stone-900/40 border border-stone-800/80 rounded-xl p-2 flex flex-col justify-between gap-1.5 shadow-inner">
             <span class="text-[10px] uppercase font-oath tracking-widest text-stone-500">Régions de la Chronique</span>
             
-            <!-- Lieu 1 -->
-            <div id="region-0" class="flex-1 bg-stone-950/50 border border-stone-800 rounded-lg p-2 flex items-center justify-between">
-                <div>
-                    <h3 class="font-oath text-base font-bold text-stone-100" id="name-0">Le Berceau de l'Empire</h3>
-                    <div class="flex gap-1 mt-1" id="cards-site-0">
-                        <span class="text-[10px] text-stone-600 italic">Aucune carte locale</span>
+            <!-- Lieu 1 : Province Gauche -->
+            <div id="region-0" class="flex-1 bg-cover bg-center border border-stone-800 rounded-lg overflow-hidden relative shadow-md" style="background-image: url('http://tts.ledergames.com/Oath/map/3_2_0/map_1.jpg');">
+                <div class="absolute inset-0 bg-stone-950/60 backdrop-blur-[1px] p-2 flex items-center justify-between">
+                    <div>
+                        <span class="text-[9px] font-bold text-cyan-400 tracking-wider uppercase block">Région Ouest</span>
+                        <h3 class="font-oath text-base font-bold text-stone-100" id="name-0">Le Berceau de l'Empire</h3>
+                        <div class="flex gap-1 mt-1" id="cards-site-0">
+                            <span class="text-[10px] text-stone-400 italic bg-black/50 px-1 rounded">Aucune carte locale</span>
+                        </div>
                     </div>
-                </div>
-                <div class="bg-black/40 p-1.5 rounded border border-stone-800/60 text-[11px] text-right">
-                    <span class="text-stone-500 block">Garnison Impériale</span>
-                    <strong class="text-red-400 font-mono" id="garrison-0">4 👤</strong>
+                    <div class="bg-black/75 p-1.5 rounded border border-stone-700 text-[11px] text-right shadow">
+                        <span class="text-stone-400 block">Garnison Impériale</span>
+                        <strong class="text-red-400 font-mono text-sm" id="garrison-0">4 👤</strong>
+                    </div>
                 </div>
             </div>
 
-            <!-- Lieu 2 -->
-            <div id="region-1" class="flex-1 bg-stone-950/50 border border-stone-800 rounded-lg p-2 flex items-center justify-between">
-                <div>
-                    <h3 class="font-oath text-base font-bold text-stone-100" id="name-1">Les Provinces Fertiles</h3>
-                    <div class="flex gap-1 mt-1" id="cards-site-1">
-                        <span class="text-[10px] text-stone-600 italic">Aucune carte locale</span>
+            <!-- Lieu 2 : Province Milieu -->
+            <div id="region-1" class="flex-1 bg-cover bg-center border border-stone-800 rounded-lg overflow-hidden relative shadow-md" style="background-image: url('http://tts.ledergames.com/Oath/map/3_2_0/map_2.jpg');">
+                <div class="absolute inset-0 bg-stone-950/60 backdrop-blur-[1px] p-2 flex items-center justify-between">
+                    <div>
+                        <span class="text-[9px] font-bold text-amber-400 tracking-wider uppercase block">Région Centrale</span>
+                        <h3 class="font-oath text-base font-bold text-stone-100" id="name-1">Les Provinces Fertiles</h3>
+                        <div class="flex gap-1 mt-1" id="cards-site-1">
+                            <span class="text-[10px] text-stone-400 italic bg-black/50 px-1 rounded">Aucune carte locale</span>
+                        </div>
                     </div>
-                </div>
-                <div class="bg-black/40 p-1.5 rounded border border-stone-800/60 text-[11px] text-right">
-                    <span class="text-stone-500 block">Garnison Impériale</span>
-                    <strong class="text-red-400 font-mono" id="garrison-1">2 👤</strong>
+                    <div class="bg-black/75 p-1.5 rounded border border-stone-700 text-[11px] text-right shadow">
+                        <span class="text-stone-400 block">Garnison Impériale</span>
+                        <strong class="text-red-400 font-mono text-sm" id="garrison-1">2 👤</strong>
+                    </div>
                 </div>
             </div>
 
-            <!-- Lieu 3 -->
-            <div id="region-2" class="flex-1 bg-stone-950/50 border border-stone-800 rounded-lg p-2 flex items-center justify-between">
-                <div>
-                    <h3 class="font-oath text-base font-bold text-stone-100" id="name-2">Les Confins Sauvages</h3>
-                    <div class="flex gap-1 mt-1" id="cards-site-2"></div>
-                </div>
-                <div class="bg-black/40 p-1.5 rounded border border-stone-800/60 text-[11px] text-right">
-                    <span class="text-amber-500 block">Votre Campement</span>
-                    <strong class="text-emerald-400 font-mono">Contrôlé 🏰</strong>
+            <!-- Lieu 3 : Province Droite -->
+            <div id="region-2" class="flex-1 bg-cover bg-center border border-stone-800 rounded-lg overflow-hidden relative shadow-md" style="background-image: url('http://tts.ledergames.com/Oath/map/3_2_0/map_3.jpg');">
+                <div class="absolute inset-0 bg-stone-950/60 backdrop-blur-[1px] p-2 flex items-center justify-between">
+                    <div>
+                        <span class="text-[9px] font-bold text-emerald-400 tracking-wider uppercase block">Région Est</span>
+                        <h3 class="font-oath text-base font-bold text-stone-100" id="name-2">Les Confins Sauvages</h3>
+                        <div class="flex gap-1 mt-1" id="cards-site-2"></div>
+                    </div>
+                    <div class="bg-black/75 p-1.5 rounded border border-stone-700 text-[11px] text-right shadow">
+                        <span class="text-amber-400 font-semibold block">Votre Campement</span>
+                        <strong class="text-emerald-400 font-mono">Contrôlé 🏰</strong>
+                    </div>
                 </div>
             </div>
         </section>
@@ -205,20 +214,18 @@
 
     <!-- LOGIQUE PAR PHASE & ACTIONS D'OATH -->
     <script>
-        // MOTEUR D'ÉTAT DU TOUR D'OATH
-        let currentPhase = "wake"; // wake, action, rest
+        let currentPhase = "wake"; 
         let player = { reserve: 6, favor: 2, secrets: 1, poolWarbands: 12, boardWarbands: 0, location: 2, isOathkeeper: true, playedVisions: 0 };
         let inventory = { cards: [], relics: ["Bannière de la Faveur du Peuple"] };
         
         let regions = [
-            { name: "Le Berceau de l'Empire", garrison: 4, cards: [{title: "Guilde des Forgerons", icon: "🛠️", favorOn: 0}] },
-            { name: "Les Provinces Fertiles", garrison: 2, cards: [{title: "Caravane d'Épices", icon: "🐪", favorOn: 0}] },
+            { name: "Le Berceau de l'Empire", garrison: 4, cards: [{title: "Guilde des Forgerons", icon: "🛠️"}] },
+            { name: "Les Provinces Fertiles", garrison: 2, cards: [{title: "Caravane d'Épices", icon: "🐪"}] },
             { name: "Les Confins Sauvages", garrison: 0, cards: [] }
         ];
 
         let drawnCardsBuffer = [];
 
-        // TEXTES OFFICIELS POUR CHAQUE DEBUT DE PHASE
         const PHASE_DATA = {
             wake: {
                 num: "Phase I",
@@ -240,7 +247,6 @@
             }
         };
 
-        // GESTION DU POPUP DE TRANSITION DE PHASE
         function showPhaseModal(phaseKey) {
             const data = PHASE_DATA[phaseKey];
             document.getElementById('modal-phase-num').innerText = data.num;
@@ -253,13 +259,11 @@
         function closePhaseModal() {
             document.getElementById('phase-modal').classList.add('hidden');
             if (currentPhase === "action") {
-                // Débloque le plateau joueur
                 document.getElementById('player-mat').className = "w-full bg-gradient-to-b from-stone-900 to-stone-950 border-t-4 border-amber-600 rounded-xl p-3 shadow-2xl shrink-0 flex flex-col gap-2 opacity-100 transition-all duration-300";
                 document.getElementById('main-phase-action-btn').innerText = "Aller au Repos ➔";
             }
         }
 
-        // AVANCEMENT DES PHASES DU TOUR
         function advancePhase() {
             if (currentPhase === "wake") {
                 addLog("✓ Phase de réveil terminée. Pas de victoire immédiate détectée. Début de la phase d'action.", "text-amber-400 font-bold");
@@ -270,7 +274,6 @@
                 addLog("✓ Clôture des actions. Début de la phase de Repos.", "text-purple-400 font-bold");
                 currentPhase = "rest";
                 document.getElementById('current-phase-indicator').innerText = "Phase Actuelle : Repos";
-                // Bloque les boutons d'actions pendant le repos
                 document.getElementById('player-mat').className = "w-full bg-gradient-to-b from-stone-900 to-stone-950 border-t-4 border-stone-700 rounded-xl p-3 shadow-2xl shrink-0 flex flex-col gap-2 opacity-50 pointer-events-none transition-all duration-300";
                 showPhaseModal("rest");
                 document.getElementById('main-phase-action-btn').innerText = "Démarrer Nouveau Tour ↺";
@@ -279,26 +282,20 @@
             }
         }
 
-        // RÉSOLUTION DE LA PHASE DE REPOS (RÈGLES EXACTES D'OATH)
         function resolveRestPhase() {
             addLog("🧹 Nettoyage économique : Les secrets reviennent sur votre plateau. Les faveurs retournent aux banques.", "text-stone-400");
             
-            // ÉCONOMIE DU RÉAPPROVISIONNEMENT :
-            // Moins on a sorti de troupes de notre réserve perso, plus on gagne de provisions.
-            // On calcule le gain de base dicté par la taille de la réserve de bandes de guerre (poolWarbands)
             let baseProvisionGain = 3;
             if (player.poolWarbands >= 10) baseProvisionGain = 5;
             else if (player.poolWarbands >= 6) baseProvisionGain = 4;
             
-            // Règle d'économie : les provisions non dépensées font gagner des cases supplémentaires vers la gauche
             let savedProvisions = player.reserve;
             let totalNewProvisions = baseProvisionGain + savedProvisions;
-            if (totalNewProvisions > 6) totalNewProvisions = 6; // Capé à 6 maximum
+            if (totalNewProvisions > 6) totalNewProvisions = 6; 
             
             player.reserve = totalNewProvisions;
             addLog(`✨ Réapprovisionnement : Grâce à vos ${player.poolWarbands} troupes en réserve, vous gagnez ${baseProvisionGain} 🔹. Vos provisions économisées portent votre jauge à : ${player.reserve}/6 🔹.`, "text-cyan-400 font-bold");
 
-            // Relancer un tour complet
             currentPhase = "wake";
             document.getElementById('current-phase-indicator').innerText = "Phase Actuelle : Réveil";
             document.getElementById('main-phase-action-btn').innerText = "Finir la Phase de Réveil ➔";
@@ -306,7 +303,6 @@
             updateUI();
         }
 
-        // MOTEUR DES 6 ACTIONS DE LA PHASE D'ACTION
         function triggerAction(actionKey) {
             if (currentPhase !== "action") return;
 
@@ -323,14 +319,12 @@
 
             switch(actionKey) {
                 case 'search':
-                    // RÈGLE : Piocher 3 cartes (simulation du deck monde ou défausse de région)
                     drawnCardsBuffer = [
                         { title: "Troupe d'Élite", type: "Guerrier", desc: "+1 dé d'attaque en rase campagne", icon: "⚔️" },
                         { title: "Ancien du Village", type: "Sage", desc: "Permet de commercer sans dépenser de secret", icon: "📜" },
                         { title: "Espion de l'Ombre", type: "Ombre", desc: "Peut voler les secrets du Prince", icon: "👥" }
                     ];
                     
-                    // Ouvre l'interface de sélection tablette
                     const choicesDiv = document.getElementById('search-choices');
                     choicesDiv.innerHTML = "";
                     drawnCardsBuffer.forEach((card, idx) => {
@@ -347,7 +341,6 @@
                     break;
 
                 case 'muster':
-                    // Enrôler : requiert une carte présente sur le lieu
                     if (currentRegion.cards.length === 0) {
                         alert("Impossible : Il n'y a aucune carte d'habitant installée sur ce lieu pour enrôler.");
                         return;
@@ -359,7 +352,7 @@
                     player.poolWarbands -= 2;
                     player.boardWarbands += 2;
                     player.reserve -= cost;
-                    addLog(`🛡️ Enrôlement réussi sur [${currentRegion.name}] via les habitants. +2 Bandes de guerre mobilisées.`);
+                    addLog(`🛡️ Enrôlement réussi sur [${currentRegion.name}] via les habitants. +2 Troupes mobilisées.`);
                     break;
 
                 case 'trade':
@@ -368,11 +361,10 @@
                         return;
                     }
                     player.reserve -= cost;
-                    // Échange basique d'économie
                     if (player.secrets > 0) {
                         player.secrets -= 1;
                         player.favor += 2;
-                        addLog(`⚖️ Commerce : Vous déposez 1 secret sur le lieu contre 2 Faveurs de la guilde locale.`);
+                        addLog(`⚖️ Commerce : Vous déposez 1 secret sur le lieu contre 2 Faveurs.`);
                     } else {
                         player.favor += 1;
                         addLog(`⚖️ Commerce local : Faute de secrets, vous glanez 1 Faveur résiduelle.`);
@@ -380,21 +372,19 @@
                     break;
 
                 case 'recover':
-                    // Prendre une relique ou un titre
                     if (player.favor >= 3) {
                         player.favor -= 3;
                         inventory.relics.push("Artefact Ancien Sacré");
                         player.reserve -= cost;
                         addLog("👑 Récupération : Vous payez le coût en Faveur pour sécuriser un Artefact Ancien Sacré !");
                     } else {
-                        alert("Il vous faut au moins 3 Faveurs pour acheter/récupérer la relique de ce lieu.");
+                        alert("Il vous faut au moins 3 Faveurs pour récupérer la relique de ce lieu.");
                     }
                     break;
 
                 case 'campaign':
-                    // Attaque de la garnison du Prince
                     if (player.boardWarbands < 1) {
-                        alert("Vous n'avez pas de troupes enrôlées sur le terrain pour mener la guerre ! Faites d'abord l'action Enrôlement.");
+                        alert("Vous n'avez pas de troupes enrôlées pour mener la guerre ! Faites d'abord l'action Enrôlement.");
                         return;
                     }
                     player.reserve -= cost;
@@ -412,7 +402,6 @@
                     break;
 
                 case 'travel':
-                    // Voyager change notre index de lieu
                     player.location = (player.location + 1) % 3;
                     player.reserve -= cost;
                     addLog(`🧭 Voyage : Vous déplacez votre pion vers : **${regions[player.location].name}**.`);
@@ -421,7 +410,6 @@
             updateUI();
         }
 
-        // LOGIQUE DE CHOIX DANS LE POPUP RECHERCHE
         let selectedSearchIdx = null;
         function selectSearchCard(idx) {
             selectedSearchIdx = idx;
@@ -441,7 +429,7 @@
                 inventory.cards.push(chosenCard);
                 addLog(`🔍 Recherche : [${chosenCard.title}] rejoint votre Conseiller personnel.`);
             } else {
-                regions[player.location].cards.push({title: chosenCard.title, icon: chosenCard.icon, favorOn: 0});
+                regions[player.location].cards.push({title: chosenCard.title, icon: chosenCard.icon});
                 player.favor += 1;
                 addLog(`🔍 Recherche : [${chosenCard.title}] est jouée sur le lieu. Vous gagnez +1 Faveur (🪙).`, "text-amber-400");
             }
@@ -451,58 +439,56 @@
             updateUI();
         }
 
-        // INTERFACE GRAPHIQUE COMPLÈTE
         function updateUI() {
             document.getElementById('p-favor').innerText = player.favor;
             document.getElementById('p-secrets').innerText = player.secrets;
             document.getElementById('p-pool-warbands').innerText = player.poolWarbands;
             document.getElementById('player-pos-text').innerText = regions[player.location].name;
 
-            // Dessin des provisions
             const track = document.getElementById('reserve-track');
             track.innerHTML = "";
             for(let i=1; i<=6; i++) {
                 track.innerHTML += `<div class="w-3.5 h-3.5 rounded-full border border-cyan-500 ${i <= player.reserve ? 'bg-cyan-500 shadow-sm shadow-cyan-500/50' : 'bg-transparent border-dashed border-stone-800'}"></div>`;
             }
 
-            // Gestion de l'affichage des 3 lieux de la carte
             for(let i=0; i<3; i++) {
-                document.getElementById(`garrison-${i}`) ? document.getElementById(`garrison-${i}`).innerText = `${regions[i].garrison} 👤` : null;
+                if(document.getElementById(`garrison-${i}`)) {
+                    document.getElementById(`garrison-${i}`).innerText = `${regions[i].garrison} 👤`;
+                }
                 
-                // Cartes posées sur les lieux
                 const cardSiteDiv = document.getElementById(`cards-site-${i}`);
                 if (cardSiteDiv) {
                     cardSiteDiv.innerHTML = "";
                     if (regions[i].cards.length === 0) {
-                        cardSiteDiv.innerHTML = `<span class="text-[10px] text-stone-600 italic">Aucune carte locale</span>`;
+                        cardSiteDiv.innerHTML = `<span class="text-[10px] text-stone-400 italic bg-black/50 px-1 rounded">Aucune carte locale</span>`;
                     } else {
                         regions[i].cards.forEach(c => {
-                            cardSiteDiv.innerHTML += `<span class="bg-stone-900 border border-stone-800 text-stone-300 text-[10px] px-1.5 py-0.5 rounded">${c.icon} ${c.title}</span>`;
+                            cardSiteDiv.innerHTML += `<span class="bg-black/80 border border-stone-700 text-amber-400 text-[10px] px-1.5 py-0.5 rounded shadow">${c.icon} ${c.title}</span>`;
                         });
                     }
                 }
 
-                // Surbrillance Tablette de notre position
                 let el = document.getElementById(`region-${i}`);
+                let overlay = el.firstElementChild;
                 if(player.location === i) {
-                    el.className = "flex-1 bg-stone-900/90 border-2 border-amber-500 p-2 flex items-center justify-between rounded-lg shadow-lg";
+                    el.className = "flex-1 bg-cover bg-center border-2 border-amber-400 rounded-lg overflow-hidden relative shadow-[0_0_15px_rgba(245,158,11,0.4)] transition-all";
+                    overlay.className = "absolute inset-0 bg-amber-950/40 backdrop-blur-[0.5px] p-2 flex items-center justify-between";
                 } else {
-                    el.className = "flex-1 bg-stone-950/50 border border-stone-800 p-2 flex items-center justify-between rounded-lg";
+                    el.className = "flex-1 bg-cover bg-center border border-stone-800 rounded-lg overflow-hidden relative transition-all";
+                    overlay.className = "absolute inset-0 bg-stone-950/70 backdrop-blur-[1px] p-2 flex items-center justify-between";
                 }
             }
 
-            // Remplissage Conseiller
             const consDiv = document.getElementById('conseiller-container');
             consDiv.innerHTML = inventory.cards.length === 0 ? `<span class="text-xs text-stone-600 italic m-auto">Aucun allié en main</span>` : "";
             inventory.cards.forEach(c => {
-                consDiv.innerHTML += `<div class="bg-stone-950 border border-amber-800/60 px-3 py-1 rounded text-xs text-amber-400 font-bold flex-shrink-0">${c.icon} ${c.title}</div>`;
+                consDiv.innerHTML += `<div class="bg-stone-950 border border-amber-800/60 px-3 py-1 rounded text-xs text-amber-400 font-bold flex-shrink-0 shadow-md">${c.icon} ${c.title}</div>`;
             });
 
-            // Remplissage Sacoche de reliques
             const relicDiv = document.getElementById('relics-container');
             relicDiv.innerHTML = inventory.relics.length === 0 ? `<span class="text-xs text-stone-600 italic m-auto">Aucun trésor</span>` : "";
             inventory.relics.forEach(r => {
-                relicDiv.innerHTML += `<div class="bg-purple-950/40 border border-purple-800/80 px-3 py-1 rounded text-xs text-purple-300 font-semibold flex-shrink-0">💎 ${r}</div>`;
+                relicDiv.innerHTML += `<div class="bg-purple-950/40 border border-purple-800/80 px-3 py-1 rounded text-xs text-purple-300 font-semibold flex-shrink-0 shadow-md">💎 ${r}</div>`;
             });
         }
 
@@ -515,7 +501,6 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // Lancement initial de la partie au Réveil
         showPhaseModal("wake");
         updateUI();
     </script>
