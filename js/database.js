@@ -3,6 +3,7 @@
 export const AssetConfig = {
   mapsPath: "assets/maps/",
   cardsPath: "assets/cards/",
+  landsPath: "assets/lands/", // Nouveau chemin pour les planches de sites
   boardsPath: "assets/boards/",
   princePath: "assets/boards/clockwork_Prince/",
 };
@@ -64,6 +65,7 @@ export const BotTraits = {
   },
 };
 
+// --- BASE DE DONNÉES DES CARTES D'HABITANTS ---
 const rawDatabaseInput = [
   { id: 1, name: "Wrestlers", suit: "ORDER" },
   { id: 2, name: "Battle Honors", suit: "ORDER" },
@@ -82,9 +84,7 @@ const rawDatabaseInput = [
   { id: 15, name: "A Small Favor", suit: "DISCORD" },
 ];
 
-// CRUCIAL : On déclare ET on exporte CardsDatabase correctement en une seule fois
 export const CardsDatabase = {};
-
 rawDatabaseInput.forEach((card, index) => {
   const sheetNumber = Math.floor(index / 20) + 1;
   const localIndex = index % 20;
@@ -101,3 +101,64 @@ rawDatabaseInput.forEach((card, index) => {
     },
   };
 });
+
+// --- NOUVELLE BASE DE DONNÉES DES LANDS (SITES) ---
+// 17 sites au total répartis sur lands.jpg (1-6), lands2.jpg (7-12) et lands3.jpg (13-17)
+// La 6ème position de lands3.jpg (index global 18) correspond au dos (landback)
+const rawLandsInput = [
+  { id: 1, name: "Ancient City" },
+  { id: 2, name: "Badlands" },
+  { id: 3, name: "Barren Coast" },
+  { id: 4, name: "Deep Woods" },
+  { id: 5, name: "Great Slum" },
+  { id: 6, name: "Lush Coast" },
+  { id: 7, name: "Mine" },
+  { id: 8, name: "Mountain Pass" },
+  { id: 9, name: "Plains" },
+  { id: 10, name: "Rocky Crag" },
+  { id: 11, name: "Salt Flats" },
+  { id: 12, name: "Shrouded Wood" },
+  { id: 13, name: "Standing Stones" },
+  { id: 14, name: "Steppe" },
+  { id: 15, name: "Temple" },
+  { id: 16, name: "The Waste" },
+  { id: 17, name: "Wand Mountain" },
+];
+
+export const LandsDatabase = {};
+rawLandsInput.forEach((land, index) => {
+  const sheetIndex = Math.floor(index / 6); // 0 = lands, 1 = lands2, 2 = lands3
+  const localIndex = index % 6;
+  const landIdStr = `l_${String(land.id).padStart(2, "0")}`;
+
+  const filenames = ["lands.jpg", "lands2.jpg", "lands3.jpg"];
+
+  // Hypothèse de découpe : Grille de 2 colonnes de large par 3 lignes de haut (6 cartes)
+  // Si tes planches sont en 3 colonnes x 2 lignes, remplace le '2' ci-dessous par un '3'
+  const columnsCount = 2;
+
+  LandsDatabase[landIdStr] = {
+    id: land.id,
+    title: land.name,
+    sprite: {
+      sheet: filenames[sheetIndex],
+      col: localIndex % columnsCount,
+      row: Math.floor(localIndex / columnsCount),
+      totalCols: columnsCount,
+      totalRows: 3,
+    },
+  };
+});
+
+// Ajout manuel de la configuration du Dos des Lands (Dernier emplacement de lands3.jpg)
+LandsDatabase["land_back"] = {
+  id: 0,
+  title: "Dos du Site",
+  sprite: {
+    sheet: "lands3.jpg",
+    col: 1, // Deuxième colonne (index 1)
+    row: 2, // Troisième ligne (index 2) -> Emplacement 6 de la planche
+    totalCols: 2,
+    totalRows: 3,
+  },
+};

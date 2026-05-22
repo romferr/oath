@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Oath - Le Prince Mécanique v2.0</title>
+        <title>Oath - Assistant de Chronique</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <style>
             @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght=700;900&family=JetBrains+Mono&display=swap");
@@ -27,32 +27,161 @@
                 border-radius: 2px;
             }
 
+            /* Animation d'apparition des cartes d'habitants */
             .oath-card-container {
-                width: 90px;
-                height: 125px;
-                border-radius: 5px;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+                width: 75px;
+                height: 105px;
+                border-radius: 4px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
                 background-size: 500% 400%;
-                transition: transform 0.15s ease;
+                transition:
+                    transform 0.15s ease,
+                    box-shadow 0.15s ease;
             }
             .oath-card-container:hover {
-                transform: translateY(-6px);
-                z-index: 40;
+                transform: translateY(-4px) scale(1.05);
+                z-index: 50;
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.9);
+            }
+
+            /* Cartes de Site (Lands) */
+            .oath-land-container {
+                width: 110px;
+                height: 75px;
+                border-radius: 6px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
+                transition: transform 0.2s ease;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            /* Placeholders */
+            .oath-slot-empty {
+                width: 75px;
+                height: 105px;
+                border: 2px dashed rgba(214, 211, 209, 0.15);
+                border-radius: 4px;
+                background: rgba(0, 0, 0, 0.4);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: "JetBrains Mono", monospace;
+                font-size: 9px;
+                color: rgba(214, 211, 209, 0.3);
+            }
+
+            /* Transitions pour le mode Plein Écran */
+            #prince-mat {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
         </style>
     </head>
     <body
-        class="h-screen w-screen p-3 flex gap-3 text-stone-200 overflow-hidden"
+        class="h-screen w-screen p-3 flex gap-3 text-stone-200 overflow-hidden relative"
     >
-        <div class="flex-1 flex flex-col gap-3 h-full">
+        <div
+            id="setup-modal"
+            class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4"
+        >
+            <div
+                class="bg-stone-900 border border-stone-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-6 text-center"
+            >
+                <div>
+                    <h1
+                        class="font-oath text-xl font-black text-amber-500 tracking-wider"
+                    >
+                        CONFIGURATION DE LA CHRONIQUE
+                    </h1>
+                    <p class="text-xs text-stone-400 font-mono mt-1">
+                        Sélectionne ton camp pour adapter l'interface de ton
+                        tapis de jeu
+                    </p>
+                </div>
+
+                <div class="space-y-2">
+                    <span
+                        class="text-[10px] font-mono text-stone-400 block uppercase tracking-wider"
+                        >1. Rôle Politique</span
+                    >
+                    <div class="grid grid-cols-3 gap-2" id="role-selector">
+                        <button
+                            data-role="CHANCELLOR"
+                            class="bg-amber-950/40 border-2 border-amber-800 text-amber-200 rounded-xl p-2.5 text-xs font-oath font-bold hover:bg-amber-900/40 transition"
+                        >
+                            👑 CHANCELIER
+                        </button>
+                        <button
+                            data-role="EXILE"
+                            class="bg-stone-800 border-2 border-transparent text-stone-300 rounded-xl p-2.5 text-xs font-oath font-bold hover:bg-stone-750 transition"
+                        >
+                            🧭 EXILÉ
+                        </button>
+                        <button
+                            data-role="CITIZEN"
+                            class="bg-stone-800 border-2 border-transparent text-stone-300 rounded-xl p-2.5 text-xs font-oath font-bold hover:bg-stone-750 transition"
+                        >
+                            🛡️ CITOYEN
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-2" id="color-section" style="display: none">
+                    <span
+                        class="text-[10px] font-mono text-stone-400 block uppercase tracking-wider"
+                        >2. Couleur de Faction</span
+                    >
+                    <div class="grid grid-cols-5 gap-2" id="color-selector">
+                        <button
+                            data-color="BLACK"
+                            class="bg-stone-950 border border-stone-700 text-stone-300 rounded-lg p-2 text-xs font-bold hover:border-white"
+                        >
+                            Noir
+                        </button>
+                        <button
+                            data-color="BLUE"
+                            class="bg-blue-900/60 border border-blue-700 text-blue-200 rounded-lg p-2 text-xs font-bold hover:border-blue-400"
+                        >
+                            Bleu
+                        </button>
+                        <button
+                            data-color="RED"
+                            class="bg-red-900/60 border border-red-700 text-red-200 rounded-lg p-2 text-xs font-bold hover:border-red-400"
+                        >
+                            Rouge
+                        </button>
+                        <button
+                            data-color="WHITE"
+                            class="bg-stone-100 border border-stone-300 text-stone-900 rounded-lg p-2 text-xs font-bold hover:border-white"
+                        >
+                            Blanc
+                        </button>
+                        <button
+                            data-color="YELLOW"
+                            class="bg-yellow-600/60 border border-yellow-500 text-yellow-100 rounded-lg p-2 text-xs font-bold hover:border-yellow-300"
+                        >
+                            Jaune
+                        </button>
+                    </div>
+                </div>
+
+                <button
+                    id="btn-start-game"
+                    disabled
+                    class="w-full bg-stone-800 text-stone-500 font-oath font-bold py-3 rounded-xl tracking-widest text-xs uppercase cursor-not-allowed transition"
+                >
+                    Confirmer & Ouvrir la Chronique ➔
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-1 flex flex-col gap-3 h-full min-w-0">
             <main
                 id="board-locations"
-                class="flex-1 grid grid-cols-3 gap-3 bg-stone-950/80 border border-stone-900 rounded-2xl p-3 shadow-inner"
+                class="flex-1 grid grid-cols-3 gap-3 bg-stone-950/90 border border-stone-900 rounded-2xl p-3 shadow-2xl overflow-hidden"
             ></main>
 
             <footer
                 id="player-mat"
-                class="h-56 border-t-4 border-amber-600 rounded-2xl p-4 flex gap-4 shadow-xl shrink-0 bg-cover bg-center relative overflow-hidden"
+                class="h-52 border-t-4 border-amber-600 rounded-2xl p-4 flex gap-4 shadow-xl shrink-0 bg-cover bg-center relative overflow-hidden"
             ></footer>
         </div>
 
@@ -67,8 +196,13 @@
                 AssetConfig,
                 BoardAssets,
                 CardsDatabase,
+                LandsDatabase,
             } from "./js/database.js";
             import { executePlayerAction, advancePhase } from "./js/actions.js";
+
+            let selectedRole = "CHANCELLOR";
+            let selectedColor = "";
+            let isPrinceHidden = false;
 
             const LocalBotTraits = {
                 AGGRESSIVE: {
@@ -97,6 +231,95 @@
                 },
             };
 
+            // --- GESTION DE LA MODALE SETUP ---
+            const roleButtons = document.querySelectorAll(
+                "#role-selector button",
+            );
+            const colorButtons = document.querySelectorAll(
+                "#color-selector button",
+            );
+            const colorSection = document.getElementById("color-section");
+            const startButton = document.getElementById("btn-start-game");
+
+            roleButtons.forEach((btn) => {
+                btn.onclick = () => {
+                    roleButtons.forEach((b) =>
+                        b.classList.remove(
+                            "border-amber-600",
+                            "bg-amber-950/40",
+                            "text-amber-200",
+                        ),
+                    );
+                    roleButtons.forEach((b) =>
+                        b.classList.add(
+                            "border-transparent",
+                            "bg-stone-800",
+                            "text-stone-300",
+                        ),
+                    );
+                    btn.classList.replace(
+                        "border-transparent",
+                        "border-amber-600",
+                    );
+                    btn.classList.replace("bg-stone-800", "bg-amber-950/40");
+                    btn.classList.replace("text-stone-300", "text-amber-200");
+
+                    selectedRole = btn.dataset.role;
+                    if (selectedRole === "CHANCELLOR") {
+                        colorSection.style.display = "none";
+                        selectedColor = "";
+                        enableStart();
+                    } else {
+                        colorSection.style.display = "block";
+                        selectedColor = "";
+                        disableStart();
+                    }
+                };
+            });
+
+            colorButtons.forEach((btn) => {
+                btn.onclick = () => {
+                    colorButtons.forEach((b) =>
+                        b.classList.remove("ring-2", "ring-amber-500"),
+                    );
+                    btn.classList.add("ring-2", "ring-amber-500");
+                    selectedColor = btn.dataset.color;
+                    enableStart();
+                };
+            });
+
+            function enableStart() {
+                startButton.disabled = false;
+                startButton.classList.replace("bg-stone-800", "bg-amber-600");
+                startButton.classList.replace(
+                    "text-stone-500",
+                    "text-stone-100",
+                );
+                startButton.classList.remove("cursor-not-allowed");
+            }
+
+            function disableStart() {
+                startButton.disabled = true;
+                startButton.classList.replace("bg-amber-600", "bg-stone-800");
+                startButton.classList.replace(
+                    "text-stone-100",
+                    "text-stone-500",
+                );
+                startButton.classList.add("cursor-not-allowed");
+            }
+
+            startButton.onclick = () => {
+                // Attribution dynamique de la clé de texture selon les choix utilisateur
+                if (selectedRole === "CHANCELLOR") {
+                    GameState.player.boardVisual = "CHANCELLOR";
+                } else {
+                    GameState.player.boardVisual = `${selectedRole}_${selectedColor}`;
+                }
+                document.getElementById("setup-modal").style.display = "none";
+                render();
+            };
+
+            // --- ENGIN DE RENDU GRAPHIQUE ---
             function buildCardUI(cardId) {
                 const card = CardsDatabase[cardId];
                 if (!card) {
@@ -104,79 +327,147 @@
                 }
                 const px = card.sprite.col * 25;
                 const py = card.sprite.row * 33.333;
-                return `<div class="oath-card-container border border-stone-950 shrink-0" style="background-image: url('${AssetConfig.cardsPath}${card.sprite.sheet}'); background-position: ${px}% ${py}%;"></div>`;
+                return `<div class="oath-card-container border border-stone-950 shrink-0" title="${card.title}" style="background-image: url('${AssetConfig.cardsPath}${card.sprite.sheet}'); background-position: ${px}% ${py}%;"></div>`;
+            }
+
+            function buildLandUI(landId) {
+                const land =
+                    LandsDatabase[landId] || LandsDatabase["land_back"];
+                const percentX =
+                    land.sprite.totalCols > 1
+                        ? (land.sprite.col / (land.sprite.totalCols - 1)) * 100
+                        : 0;
+                const percentY =
+                    land.sprite.totalRows > 1
+                        ? (land.sprite.row / (land.sprite.totalRows - 1)) * 100
+                        : 0;
+                const backgroundSizeW = land.sprite.totalCols * 100;
+                const backgroundSizeH = land.sprite.totalRows * 100;
+                return `<div class="oath-land-container bg-no-repeat" style="background-image: url('${AssetConfig.landsPath}${land.sprite.sheet}'); background-position: ${percentX}% ${percentY}%; background-size: ${backgroundSizeW}% ${backgroundSizeH}%;" title="${land.title}"></div>`;
+            }
+
+            function togglePrinceView() {
+                isPrinceHidden = !isPrinceHidden;
+                const princePanel = document.getElementById("prince-mat");
+                if (isPrinceHidden) {
+                    princePanel.style.width = "0px";
+                    princePanel.style.padding = "0px";
+                    princePanel.style.marginLeft = "-12px";
+                    princePanel.style.borderLeftWidth = "0px";
+                    princePanel.style.opacity = "0";
+                } else {
+                    princePanel.style.width = "24rem"; // w-96
+                    princePanel.style.padding = "1rem";
+                    princePanel.style.marginLeft = "0px";
+                    princePanel.style.borderLeftWidth = "4px";
+                    princePanel.style.opacity = "1";
+                }
+                // Mise à jour de l'état du bouton dans le tapis joueur après modification
+                document.getElementById("btn-toggle-fullscreen").innerText =
+                    isPrinceHidden ? "👁️ VOIR LE PRINCE" : "🖥️ PLEIN ÉCRAN";
             }
 
             function render() {
-                // 1. MISE À ZONE DES CARTES ET RÉGIONS
+                // Sécurité si le setup n'a pas encore validé l'image joueur
+                if (!GameState.player.boardVisual) return;
+
+                // 1. VOLET CENTRAL UNIQUE DES REGIONS
                 document.getElementById("board-locations").innerHTML =
                     GameState.regions
                         .map((reg, idx) => {
-                            const isActive = GameState.player.location === idx;
-                            const cardsHTML = reg.cards
-                                .map((cId) => buildCardUI(cId))
-                                .join("");
+                            const isPlayerHere =
+                                GameState.player.location === idx;
+                            const currentLandId = `l_${String(idx + 1 + (GameState.turn || 0)).padStart(2, "0")}`;
+
+                            const siteCardsHTML =
+                                reg.cards.length > 0
+                                    ? reg.cards
+                                          .map((cId) => buildCardUI(cId))
+                                          .join("")
+                                    : `<div class="oath-slot-empty">VIDE</div>`;
+
+                            const hasDiscard = reg.cards.length > 1;
+                            const discardHTML = hasDiscard
+                                ? buildCardUI(null)
+                                : `<div class="oath-slot-empty border-red-950/40 text-red-900/30">DISCARD</div>`;
+
                             return `
-                    <div class="h-full bg-cover bg-center border-2 ${isActive ? "border-amber-500 shadow-xl" : "border-stone-900"} rounded-xl overflow-hidden relative flex flex-col justify-between"
-                         style="background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.6)), url('${AssetConfig.mapsPath}map_${idx + 1}.jpg');">
-                        <div class="p-3 flex justify-between items-start bg-gradient-to-b from-black/80 to-transparent">
-                            <h4 class="font-oath text-xs font-bold text-stone-100 uppercase tracking-wide">${reg.name}</h4>
-                            <span class="bg-stone-950/90 px-2 py-0.5 rounded border border-stone-800 text-[10px] font-mono text-red-400 font-bold">👤 ${reg.garrison}</span>
+                    <div class="h-full rounded-2xl border-2 ${isPlayerHere ? "border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.15)] bg-stone-900/40" : "border-stone-900 bg-stone-950/60"} relative flex flex-col justify-between overflow-hidden">
+                        <div class="p-3 bg-gradient-to-b from-black/60 to-transparent flex flex-col gap-2.5">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-[9px] font-mono tracking-widest text-stone-500 block uppercase font-bold">Région 0${idx + 1}</span>
+                                    <h4 class="font-oath text-xs font-black text-stone-200 uppercase tracking-wide">${reg.name}</h4>
+                                </div>
+                                <span class="bg-stone-950 border border-stone-850 px-2 py-0.5 rounded text-[10px] font-mono text-cyan-400 font-bold">👤 ${reg.garrison}</span>
+                            </div>
+                            <div class="flex justify-center pt-1">${buildLandUI(currentLandId)}</div>
                         </div>
-                        <div class="p-3 flex gap-2 overflow-x-auto custom-scroll items-end min-h-[140px]">
-                            ${cardsHTML}
+
+                        <div class="p-3 flex flex-col gap-3 justify-end bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+                            <div>
+                                <span class="text-[9px] font-mono text-stone-400 block mb-1 uppercase tracking-wider">📜 Habitants</span>
+                                <div class="flex gap-1.5 overflow-x-auto custom-scroll pb-1 min-h-[110px] items-end">${siteCardsHTML}</div>
+                            </div>
+                            <div class="border-t border-stone-900/80 pt-2 flex justify-between items-center">
+                                <span class="text-[9px] font-mono text-red-400 block uppercase tracking-wider">🗑️ Défausse</span>
+                                <div class="shrink-0">${discardHTML}</div>
+                            </div>
                         </div>
                     </div>`;
                         })
                         .join("");
 
-                // 2. RENDU DU TAPIS JOUEUR
+                // 2. TAPIS DU JOUEUR ACTUALISÉ SELON LE SETUP COMPLET
                 const playerImg = BoardAssets[GameState.player.boardVisual];
                 const playerMat = document.getElementById("player-mat");
-                playerMat.style.backgroundImage = `linear-gradient(rgba(24,24,27,0.8), rgba(24,24,27,0.95)), url('${AssetConfig.boardsPath}${playerImg}')`;
+                playerMat.style.backgroundImage = `linear-gradient(rgba(24,24,27,0.85), rgba(24,24,27,0.97)), url('${AssetConfig.boardsPath}${playerImg}')`;
 
                 const supplyHTML = Array.from(
                     { length: 6 },
                     (_, i) => `
-                <div class="w-2.5 h-2.5 rounded-full border ${i < GameState.player.supply ? "bg-amber-500 border-amber-400" : "bg-transparent border-stone-700"}"></div>
+                <div class="w-2 h-2 rounded-full border ${i < GameState.player.supply ? "bg-amber-500 border-amber-400" : "bg-transparent border-stone-700"}"></div>
             `,
                 ).join("");
 
                 playerMat.innerHTML = `
                 <div class="w-2/5 flex flex-col justify-between border-r border-stone-800/60 pr-4 z-10">
                     <div class="flex justify-between items-center">
-                        <h3 class="font-oath text-xs font-bold text-amber-500 tracking-wider">Tapis Joueur</h3>
-                        <div class="flex gap-1 bg-black/50 px-2 py-0.5 rounded border border-stone-800 text-xs items-center">
-                            <span class="text-[8px] text-stone-400 font-mono">SUPPLY:</span>
-                            ${supplyHTML}
-                        </div>
+                        <h3 class="font-oath text-xs font-bold text-amber-500 tracking-wider">Tapis Joueur (${selectedRole})</h3>
+                        <div class="flex gap-1 bg-black/50 px-1.5 py-0.5 rounded border border-stone-800 text-xs items-center">${supplyHTML}</div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2 my-2 font-mono text-center text-xs">
-                        <div class="bg-black/40 p-1.5 rounded border border-stone-800/50">🪙 Fav: <strong class="text-amber-400">${GameState.player.favor}</strong></div>
-                        <div class="bg-black/40 p-1.5 rounded border border-stone-800/50">👁️ Sec: <strong class="text-purple-400">${GameState.player.secrets}</strong></div>
-                        <div class="bg-black/40 p-1.5 rounded border border-stone-800/50">👥 Troupes: <strong class="text-cyan-400">${GameState.player.warbands}</strong></div>
+                    <div class="grid grid-cols-3 gap-1.5 my-1 font-mono text-center text-[11px]">
+                        <div class="bg-black/50 p-1 rounded border border-stone-800/40 font-bold">🪙 ${GameState.player.favor}</div>
+                        <div class="bg-black/50 p-1 rounded border border-stone-800/40 font-bold">👁️ ${GameState.player.secrets}</div>
+                        <div class="bg-black/50 p-1 rounded border border-stone-800/40 font-bold">👥 ${GameState.player.warbands}</div>
                     </div>
-                    <div class="grid grid-cols-3 gap-1.5 font-oath text-[10px] font-bold">
-                        <button id="act-search" class="bg-stone-900/90 border border-stone-700 p-1 rounded hover:border-amber-500">🔍 CHERCHER</button>
-                        <button id="act-muster" class="bg-stone-900/90 border border-stone-700 p-1 rounded hover:border-amber-500">🛡️ ENRÔLER</button>
-                        <button id="act-travel" class="bg-stone-900/90 border border-stone-700 p-1 rounded hover:border-amber-500">🧭 VOYAGER</button>
+                    <div class="grid grid-cols-4 gap-1 font-oath text-[8px] font-bold">
+                        <button id="act-search" class="bg-stone-900/90 border border-stone-700 py-1 rounded hover:border-amber-500">🔍 CHERCHER</button>
+                        <button id="act-muster" class="bg-stone-900/90 border border-stone-700 py-1 rounded hover:border-amber-500">🛡️ ENRÔLER</button>
+                        <button id="act-travel" class="bg-stone-900/90 border border-stone-700 py-1 rounded hover:border-amber-500">🧭 VOYAGER</button>
+                        <button id="btn-toggle-fullscreen" class="bg-amber-950/80 border border-amber-700 py-1 rounded hover:bg-amber-900 text-amber-200 text-[7px] font-mono tracking-tighter">
+                            ${isPrinceHidden ? "👁️ VOIR LE PRINCE" : "🖥️ PLEIN ÉCRAN"}
+                        </button>
                     </div>
                 </div>
                 <div class="flex-1 flex flex-col z-10">
-                    <span class="text-[10px] font-oath text-stone-400 mb-1">📜 CONSEILLERS (MAIN)</span>
-                    <div class="flex-1 flex gap-2 items-center overflow-x-auto custom-scroll px-1">
+                    <span class="text-[9px] font-oath text-stone-400 mb-1 uppercase tracking-wider">📜 Conseillers en Main</span>
+                    <div class="flex-1 flex gap-1.5 items-center overflow-x-auto custom-scroll px-1">
                         ${GameState.player.hand.map((cId) => buildCardUI(cId)).join("")}
                     </div>
                 </div>`;
 
+                // Assignation des handlers
                 document.getElementById("act-search").onclick = () =>
                     executePlayerAction("search");
                 document.getElementById("act-muster").onclick = () =>
                     executePlayerAction("muster");
                 document.getElementById("act-travel").onclick = () =>
                     executePlayerAction("travel");
+                document.getElementById("btn-toggle-fullscreen").onclick = () =>
+                    togglePrinceView();
 
-                // 3. RENDU DU TAPIS DU PRINCE MÉCANIQUE
+                // 3. TAPIS DU PRINCE MÉCANIQUE
                 const princeImg = BoardAssets[GameState.prince.boardVisual];
                 const princeMat = document.getElementById("prince-mat");
                 princeMat.style.backgroundImage = `linear-gradient(rgba(45,10,10,0.85), rgba(12,10,10,0.98)), url('${AssetConfig.princePath}${princeImg}')`;
@@ -185,64 +476,56 @@
                 const threatHTML = Array.from(
                     { length: 6 },
                     (_, i) => `
-                <div class="p-1.5 rounded border text-center font-mono text-xs ${GameState.prince.threatLevel === i + 1 ? "bg-red-700 border-red-400 text-white font-bold shadow-md shadow-red-950/50" : "bg-black/50 border-stone-800 text-stone-500"}">
-                    ${i + 1}
-                </div>
+                <div class="p-1 rounded border text-center font-mono text-xs ${GameState.prince.threatLevel === i + 1 ? "bg-red-700 border-red-400 text-white font-bold" : "bg-black/50 border-stone-800 text-stone-500"}">${i + 1}</div>
             `,
                 ).join("");
 
                 const reliquaryHTML = GameState.reliquary.available
                     .map(
-                        (r) => `
-                <span class="bg-amber-950/40 border border-amber-800/60 text-amber-300 text-[9px] px-2 py-0.5 rounded font-mono">📜 ${r}</span>
-            `,
+                        (r) =>
+                            `<span class="bg-amber-950/40 border border-amber-800/60 text-amber-300 text-[9px] px-2 py-0.5 rounded font-mono">📜 ${r}</span>`,
                     )
                     .join("");
-
                 const logsHTML = GameState.logs
                     .map(
-                        (l) => `
-                <div class="text-[11px] leading-relaxed"><span class="text-stone-600">[${l.time}]</span> <span class="${l.type === "prince" ? "text-red-300 font-medium" : "text-stone-400"}">${l.text}</span></div>
-            `,
+                        (l) =>
+                            `<div class="text-[11px] leading-relaxed"><span class="text-stone-600">[${l.time}]</span> <span class="${l.type === "prince" ? "text-red-300 font-medium" : "text-stone-400"}">${l.text}</span></div>`,
                     )
                     .join("");
-
                 const btnText =
                     GameState.phase === "rest"
                         ? "Calculer le Tour du Prince 🤖"
                         : "Valider la Phase ➔";
 
                 princeMat.innerHTML = `
-                <div class="flex flex-col gap-3 h-full min-h-0 z-10">
-                    <div class="border-b border-red-900/60 pb-2">
+                <div class="flex flex-col gap-2.5 h-full min-h-0 z-10">
+                    <div class="border-b border-red-900/60 pb-1.5">
                         <div class="flex justify-between items-center">
                             <h2 class="font-oath text-sm font-black text-red-400 tracking-widest">LE PRINCE MÉCANIQUE</h2>
-                            <span class="text-[9px] bg-red-950 border border-red-700 px-2 py-0.5 rounded text-red-200 font-mono font-bold">AUTOMATE</span>
+                            <span class="text-[9px] bg-red-950 border border-red-700 px-1.5 py-0.5 rounded text-red-200 font-mono font-bold">BOT</span>
                         </div>
                         <div class="mt-2 flex items-center gap-2 bg-black/60 border border-red-950 p-2 rounded-lg">
                             <span class="text-xl">${traitInfo.icon}</span>
                             <div>
-                                <div class="text-[10px] text-stone-500 font-mono uppercase tracking-wider">Trait Actif</div>
-                                <div class="text-xs font-bold text-stone-200">${traitInfo.name} : <span class="font-normal text-stone-400 italic text-[11px]">${traitInfo.effect}</span></div>
+                                <div class="text-[10px] text-stone-500 font-mono uppercase">Trait Actif</div>
+                                <div class="text-xs font-bold text-stone-200">${traitInfo.name}</div>
                             </div>
                         </div>
                     </div>
                     <div>
-                        <span class="text-[10px] font-mono text-stone-400 block mb-1">🔥 POSITION SUR LA PISTE DE MENACE :</span>
+                        <span class="text-[9px] font-mono text-stone-400 block mb-1 uppercase tracking-wider">🔥 Piste Menace</span>
                         <div class="grid grid-cols-6 gap-1">${threatHTML}</div>
                     </div>
                     <div class="bg-black/50 border border-stone-850 p-2 rounded-xl">
-                        <span class="text-[10px] font-oath text-amber-500 block mb-1">💎 BANQUES DU RELIQUAIRE</span>
-                        <div class="flex flex-wrap gap-1 min-h-[24px] items-center">${reliquaryHTML}</div>
+                        <span class="text-[9px] font-oath text-amber-500 block mb-1 uppercase tracking-wider">💎 Reliquaire</span>
+                        <div class="flex flex-wrap gap-1 min-h-[20px] items-center">${reliquaryHTML}</div>
                     </div>
                     <div class="flex-1 flex flex-col min-h-0">
-                        <span class="text-[10px] font-mono text-red-400 block mb-1">🧠 COMPILATEUR LOGIQUE (MINDMAP) :</span>
-                        <div id="log-box" class="flex-1 bg-black/80 border border-red-950 rounded-xl p-2.5 font-mono overflow-y-auto custom-scroll space-y-1.5 text-stone-300 shadow-inner">
-                            ${logsHTML}
-                        </div>
+                        <span class="text-[9px] font-mono text-red-400 block mb-1 uppercase tracking-wider">🧠 Logique Arbre Decisionnel</span>
+                        <div id="log-box" class="flex-1 bg-black/80 border border-red-950 rounded-xl p-2 font-mono overflow-y-auto custom-scroll space-y-1 text-stone-300 shadow-inner">${logsHTML}</div>
                     </div>
                 </div>
-                <button id="btn-phase" class="w-full bg-red-950 hover:bg-red-900 border border-red-700 text-red-100 font-oath font-bold py-3 rounded-xl tracking-widest text-xs uppercase transition mt-3 z-10 shadow-lg">${btnText}</button>
+                <button id="btn-phase" class="w-full bg-red-950 hover:bg-red-900 border border-red-700 text-red-100 font-oath font-bold py-2.5 rounded-xl tracking-widest text-xs uppercase transition mt-2 z-10 shadow-lg">${btnText}</button>
             `;
 
                 document.getElementById("btn-phase").onclick = () =>
@@ -252,7 +535,7 @@
             }
 
             window.addEventListener("gameStateUpdated", render);
-            render();
+            // On ne lance pas immédiatement le render pour forcer l'affichage de la modale en premier plan
         </script>
     </body>
 </html>
