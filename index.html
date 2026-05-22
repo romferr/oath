@@ -6,7 +6,7 @@
         <title>Oath - Le Prince Mécanique v2.0</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <style>
-            @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=JetBrains+Mono&display=swap");
+            @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght=700;900&family=JetBrains+Mono&display=swap");
             body {
                 background-color: #080707;
                 font-family: "Georgia", serif;
@@ -64,13 +64,12 @@
         <script type="module">
             import { GameState } from "./js/state.js";
             import {
-                CardsDatabase,
                 AssetConfig,
                 BoardAssets,
+                CardsDatabase,
             } from "./js/database.js";
             import { executePlayerAction, advancePhase } from "./js/actions.js";
 
-            // Ce dictionnaire temporaire évite les plantages si database.js n'a pas encore fini de charger ses clés
             const LocalBotTraits = {
                 AGGRESSIVE: {
                     id: "t_01",
@@ -109,7 +108,7 @@
             }
 
             function render() {
-                // 1. MISE À JOUR DES CARTES ET DES RÉGIONS DU ROYAUME
+                // 1. MISE À ZONE DES CARTES ET RÉGIONS
                 document.getElementById("board-locations").innerHTML =
                     GameState.regions
                         .map((reg, idx) => {
@@ -131,7 +130,7 @@
                         })
                         .join("");
 
-                // 2. RENDU DU TAPIS JOUEUR (Charge depuis assets/boards/)
+                // 2. RENDU DU TAPIS JOUEUR
                 const playerImg = BoardAssets[GameState.player.boardVisual];
                 const playerMat = document.getElementById("player-mat");
                 playerMat.style.backgroundImage = `linear-gradient(rgba(24,24,27,0.8), rgba(24,24,27,0.95)), url('${AssetConfig.boardsPath}${playerImg}')`;
@@ -170,7 +169,6 @@
                     </div>
                 </div>`;
 
-                // Ré-attachement immédiat des actions boutons du joueur
                 document.getElementById("act-search").onclick = () =>
                     executePlayerAction("search");
                 document.getElementById("act-muster").onclick = () =>
@@ -178,7 +176,7 @@
                 document.getElementById("act-travel").onclick = () =>
                     executePlayerAction("travel");
 
-                // 3. RENDU DU TAPIS DU PRINCE (Charge depuis assets/boards/clockwork_Prince/)
+                // 3. RENDU DU TAPIS DU PRINCE MÉCANIQUE
                 const princeImg = BoardAssets[GameState.prince.boardVisual];
                 const princeMat = document.getElementById("prince-mat");
                 princeMat.style.backgroundImage = `linear-gradient(rgba(45,10,10,0.85), rgba(12,10,10,0.98)), url('${AssetConfig.princePath}${princeImg}')`;

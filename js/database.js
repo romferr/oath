@@ -1,15 +1,12 @@
 // js/database.js
 
-// Configuration globale des chemins d'accès aux ressources graphiques
 export const AssetConfig = {
   mapsPath: "assets/maps/",
   cardsPath: "assets/cards/",
   boardsPath: "assets/boards/",
-  // Dossier isolé contenant le matériel du bot
   princePath: "assets/boards/clockwork_Prince/",
 };
 
-// Les six factions/suites du jeu Oath
 export const Suits = {
   ORDER: { name: "Ordre", icon: "🛡️", color: "text-blue-400" },
   ARCANE: { name: "Arcane", icon: "🔮", color: "text-purple-400" },
@@ -19,9 +16,7 @@ export const Suits = {
   BEAST: { name: "Bête", icon: "🐾", color: "text-emerald-500" },
 };
 
-// Dictionnaire complet associant chaque ID de plateau à son fichier image réel
 export const BoardAssets = {
-  // Plateaux des factions joueuses (situés à la racine de assets/boards/)
   CHANCELLOR: "player_board_chancellor.jpg",
   EXILE_BLACK: "player_board_black_exile.jpg",
   CITIZEN_BLACK: "player_board_black_citizen.jpg",
@@ -34,7 +29,6 @@ export const BoardAssets = {
   EXILE_YELLOW: "player_board_yellow_exile.jpg",
   CITIZEN_YELLOW: "player_board_yellow_citizen.jpg",
 
-  // Matériel du Prince Mécanique (situé dans assets/boards/clockwork_Prince/)
   CLOCKWORK_PRINCE: "player_board_clockwork.jpg",
   RELIQUARY: "reliquary_back.jpg",
   MINDMAP: "mindmap.jpg",
@@ -43,7 +37,6 @@ export const BoardAssets = {
   RULES_2: "botrules_front_2.jpg",
 };
 
-// Jetons de traits/comportements officiels issus du fichier bot_tokens_front.jpg
 export const BotTraits = {
   AGGRESSIVE: {
     id: "t_01",
@@ -71,7 +64,6 @@ export const BotTraits = {
   },
 };
 
-// Entrées brutes de la base de données de cartes
 const rawDatabaseInput = [
   { id: 1, name: "Wrestlers", suit: "ORDER" },
   { id: 2, name: "Battle Honors", suit: "ORDER" },
@@ -90,11 +82,10 @@ const rawDatabaseInput = [
   { id: 15, name: "A Small Favor", suit: "DISCORD" },
 ];
 
-// Génération dynamique et formatée du catalogue de cartes avec leurs coordonnées de sprites
+// CRUCIAL : On déclare ET on exporte CardsDatabase correctement en une seule fois
 export const CardsDatabase = {};
 
 rawDatabaseInput.forEach((card, index) => {
-  // Calcul automatique du fichier d'atlas de cartes (20 cartes par fichier image)
   const sheetNumber = Math.floor(index / 20) + 1;
   const localIndex = index % 20;
   const cardIdStr = `c_${String(card.id).padStart(3, "0")}`;
