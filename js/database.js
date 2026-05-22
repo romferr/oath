@@ -4,40 +4,31 @@ export const AssetConfig = {
   mapsPath: "assets/maps/",
   cardsPath: "assets/cards/",
   boardsPath: "assets/boards/",
+  // On isole le sous-dossier du Prince en respectant la casse exacte
+  princePath: "assets/boards/clockwork_Prince/",
 };
 
 export const BoardAssets = {
+  // Plateaux joueurs (à la racine de assets/boards/)
   CHANCELLOR: "player_board_chancellor.jpg",
-  CLOCKWORK_PRINCE: "player_board_clockwork.jpg", // Le vrai plateau de l'Automa
+  EXILE_BLACK: "player_board_black_exile.jpg",
+  CITIZEN_BLACK: "player_board_black_citizen.jpg",
+  EXILE_BLUE: "player_board_blue_exile.jpg",
+  CITIZEN_BLUE: "player_board_blue_citizen.jpg",
   EXILE_RED: "player_board_red_exile.jpg",
+  CITIZEN_RED: "player_board_red_citizen.jpg",
+  EXILE_WHITE: "player_board_white_exile.jpg",
+  CITIZEN_WHITE: "player_board_white_citizen.jpg",
   EXILE_YELLOW: "player_board_yellow_exile.jpg",
-  // ... (les autres plateaux restent mappés ici)
+  CITIZEN_YELLOW: "player_board_yellow_citizen.jpg",
+
+  // Éléments du Prince (dans assets/boards/clockwork_Prince/)
+  CLOCKWORK_PRINCE: "player_board_clockwork.jpg",
+  RELIQUARY: "reliquary_back.jpg",
+  MINDMAP: "mindmap.jpg",
+  TOKENS: "bot_tokens_front.jpg",
+  RULES_1: "botrules_front_1.jpg",
+  RULES_2: "botrules_front_2.jpg",
 };
 
-// Types de jetons de comportement du Prince (issus de bot_tokens_front.jpg)
-export const BotTraits = {
-  AGGRESSIVE: {
-    id: "t_01",
-    name: "Agressif",
-    effect: "Priorise l'attaque des armées du joueur",
-    icon: "⚔️",
-  },
-  HOARDER: {
-    id: "t_02",
-    name: "Thésauriseur",
-    effect: "Priorise la récupération des Reliques du Reliquaire",
-    icon: "💎",
-  },
-  EXPANSIONIST: {
-    id: "t_03",
-    name: "Expansionniste",
-    effect: "Recrute en priorité sur les sites vides",
-    icon: "🏰",
-  },
-  SCHEMER: {
-    id: "t_04",
-    name: "Complotiste",
-    effect: "Gagne +1 Secret lors des phases de repos",
-    icon: "👁️",
-  },
-};
+// ... Le reste de ta CardsDatabase reste identique

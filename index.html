@@ -26,6 +26,19 @@
                 background: #5c1d1d;
                 border-radius: 2px;
             }
+
+            .oath-card-container {
+                width: 90px;
+                height: 125px;
+                border-radius: 5px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+                background-size: 500% 400%;
+                transition: transform 0.15s ease;
+            }
+            .oath-card-container:hover {
+                transform: translateY(-6px);
+                z-index: 40;
+            }
         </style>
     </head>
     <body
@@ -39,7 +52,7 @@
 
             <footer
                 id="player-mat"
-                class="h-56 rounded-2xl p-4 flex gap-4 shadow-xl shrink-0 bg-cover bg-center relative overflow-hidden"
+                class="h-56 border-t-4 border-amber-600 rounded-2xl p-4 flex gap-4 shadow-xl shrink-0 bg-cover bg-center relative overflow-hidden"
             ></footer>
         </div>
 
@@ -54,28 +67,123 @@
                 CardsDatabase,
                 AssetConfig,
                 BoardAssets,
-                BotTraits,
             } from "./js/database.js";
             import { executePlayerAction, advancePhase } from "./js/actions.js";
 
-            function render() {
-                // [Rendu standard du plateau et du joueur identique à l'architecture précédente...]
-                // (Laissé compact ici pour se concentrer sur l'intégration des assets de l'automate)
+            // Ce dictionnaire temporaire évite les plantages si database.js n'a pas encore fini de charger ses clés
+            const LocalBotTraits = {
+                AGGRESSIVE: {
+                    id: "t_01",
+                    name: "Agressif",
+                    effect: "Priorise l'attaque des armées du joueur",
+                    icon: "⚔️",
+                },
+                HOARDER: {
+                    id: "t_02",
+                    name: "Thésauriseur",
+                    effect: "Priorise la récupération des Reliques du Reliquaire",
+                    icon: "💎",
+                },
+                EXPANSIONIST: {
+                    id: "t_03",
+                    name: "Expansionniste",
+                    effect: "Recrute en priorité sur les sites vides",
+                    icon: "🏰",
+                },
+                SCHEMER: {
+                    id: "t_04",
+                    name: "Complotiste",
+                    effect: "Gagne +1 Secret lors des phases de repos",
+                    icon: "👁️",
+                },
+            };
 
-                // RENDU DU TAPIS JOUEUR
+            function buildCardUI(cardId) {
+                const card = CardsDatabase[cardId];
+                if (!card) {
+                    return `<div class="oath-card-container border border-stone-850 bg-cover" style="background-image: url('${AssetConfig.cardsPath}cardbackDefault.jpg');"></div>`;
+                }
+                const px = card.sprite.col * 25;
+                const py = card.sprite.row * 33.333;
+                return `<div class="oath-card-container border border-stone-950 shrink-0" style="background-image: url('${AssetConfig.cardsPath}${card.sprite.sheet}'); background-position: ${px}% ${py}%;"></div>`;
+            }
+
+            function render() {
+                // 1. MISE À JOUR DES CARTES ET DES RÉGIONS DU ROYAUME
+                document.getElementById("board-locations").innerHTML =
+                    GameState.regions
+                        .map((reg, idx) => {
+                            const isActive = GameState.player.location === idx;
+                            const cardsHTML = reg.cards
+                                .map((cId) => buildCardUI(cId))
+                                .join("");
+                            return `
+                    <div class="h-full bg-cover bg-center border-2 ${isActive ? "border-amber-500 shadow-xl" : "border-stone-900"} rounded-xl overflow-hidden relative flex flex-col justify-between"
+                         style="background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.6)), url('${AssetConfig.mapsPath}map_${idx + 1}.jpg');">
+                        <div class="p-3 flex justify-between items-start bg-gradient-to-b from-black/80 to-transparent">
+                            <h4 class="font-oath text-xs font-bold text-stone-100 uppercase tracking-wide">${reg.name}</h4>
+                            <span class="bg-stone-950/90 px-2 py-0.5 rounded border border-stone-800 text-[10px] font-mono text-red-400 font-bold">👤 ${reg.garrison}</span>
+                        </div>
+                        <div class="p-3 flex gap-2 overflow-x-auto custom-scroll items-end min-h-[140px]">
+                            ${cardsHTML}
+                        </div>
+                    </div>`;
+                        })
+                        .join("");
+
+                // 2. RENDU DU TAPIS JOUEUR (Charge depuis assets/boards/)
                 const playerImg = BoardAssets[GameState.player.boardVisual];
                 const playerMat = document.getElementById("player-mat");
                 playerMat.style.backgroundImage = `linear-gradient(rgba(24,24,27,0.8), rgba(24,24,27,0.95)), url('${AssetConfig.boardsPath}${playerImg}')`;
-                playerMat.innerHTML = `<div class="p-2 z-10 font-oath text-amber-500 text-xs">🛡️ Tapis de l'Exilé (Actif)</div>`;
 
-                // RENDU DU PRINCE DE FER AVEC PLAYER_BOARD_CLOCKWORK.JPG
+                const supplyHTML = Array.from(
+                    { length: 6 },
+                    (_, i) => `
+                <div class="w-2.5 h-2.5 rounded-full border ${i < GameState.player.supply ? "bg-amber-500 border-amber-400" : "bg-transparent border-stone-700"}"></div>
+            `,
+                ).join("");
+
+                playerMat.innerHTML = `
+                <div class="w-2/5 flex flex-col justify-between border-r border-stone-800/60 pr-4 z-10">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-oath text-xs font-bold text-amber-500 tracking-wider">Tapis Joueur</h3>
+                        <div class="flex gap-1 bg-black/50 px-2 py-0.5 rounded border border-stone-800 text-xs items-center">
+                            <span class="text-[8px] text-stone-400 font-mono">SUPPLY:</span>
+                            ${supplyHTML}
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 my-2 font-mono text-center text-xs">
+                        <div class="bg-black/40 p-1.5 rounded border border-stone-800/50">🪙 Fav: <strong class="text-amber-400">${GameState.player.favor}</strong></div>
+                        <div class="bg-black/40 p-1.5 rounded border border-stone-800/50">👁️ Sec: <strong class="text-purple-400">${GameState.player.secrets}</strong></div>
+                        <div class="bg-black/40 p-1.5 rounded border border-stone-800/50">👥 Troupes: <strong class="text-cyan-400">${GameState.player.warbands}</strong></div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-1.5 font-oath text-[10px] font-bold">
+                        <button id="act-search" class="bg-stone-900/90 border border-stone-700 p-1 rounded hover:border-amber-500">🔍 CHERCHER</button>
+                        <button id="act-muster" class="bg-stone-900/90 border border-stone-700 p-1 rounded hover:border-amber-500">🛡️ ENRÔLER</button>
+                        <button id="act-travel" class="bg-stone-900/90 border border-stone-700 p-1 rounded hover:border-amber-500">🧭 VOYAGER</button>
+                    </div>
+                </div>
+                <div class="flex-1 flex flex-col z-10">
+                    <span class="text-[10px] font-oath text-stone-400 mb-1">📜 CONSEILLERS (MAIN)</span>
+                    <div class="flex-1 flex gap-2 items-center overflow-x-auto custom-scroll px-1">
+                        ${GameState.player.hand.map((cId) => buildCardUI(cId)).join("")}
+                    </div>
+                </div>`;
+
+                // Ré-attachement immédiat des actions boutons du joueur
+                document.getElementById("act-search").onclick = () =>
+                    executePlayerAction("search");
+                document.getElementById("act-muster").onclick = () =>
+                    executePlayerAction("muster");
+                document.getElementById("act-travel").onclick = () =>
+                    executePlayerAction("travel");
+
+                // 3. RENDU DU TAPIS DU PRINCE (Charge depuis assets/boards/clockwork_Prince/)
                 const princeImg = BoardAssets[GameState.prince.boardVisual];
                 const princeMat = document.getElementById("prince-mat");
+                princeMat.style.backgroundImage = `linear-gradient(rgba(45,10,10,0.85), rgba(12,10,10,0.98)), url('${AssetConfig.princePath}${princeImg}')`;
 
-                // Injection de la texture d'origine du bot avec un filtre rouge impérial
-                princeMat.style.backgroundImage = `linear-gradient(rgba(45,10,10,0.85), rgba(12,10,10,0.98)), url('${AssetConfig.boardsPath}${princeImg}')`;
-
-                const traitInfo = BotTraits[GameState.prince.trait];
+                const traitInfo = LocalBotTraits[GameState.prince.trait];
                 const threatHTML = Array.from(
                     { length: 6 },
                     (_, i) => `
@@ -101,6 +209,11 @@
                     )
                     .join("");
 
+                const btnText =
+                    GameState.phase === "rest"
+                        ? "Calculer le Tour du Prince 🤖"
+                        : "Valider la Phase ➔";
+
                 princeMat.innerHTML = `
                 <div class="flex flex-col gap-3 h-full min-h-0 z-10">
                     <div class="border-b border-red-900/60 pb-2">
@@ -116,17 +229,14 @@
                             </div>
                         </div>
                     </div>
-
                     <div>
                         <span class="text-[10px] font-mono text-stone-400 block mb-1">🔥 POSITION SUR LA PISTE DE MENACE :</span>
                         <div class="grid grid-cols-6 gap-1">${threatHTML}</div>
                     </div>
-
                     <div class="bg-black/50 border border-stone-850 p-2 rounded-xl">
                         <span class="text-[10px] font-oath text-amber-500 block mb-1">💎 BANQUES DU RELIQUAIRE</span>
                         <div class="flex flex-wrap gap-1 min-h-[24px] items-center">${reliquaryHTML}</div>
                     </div>
-
                     <div class="flex-1 flex flex-col min-h-0">
                         <span class="text-[10px] font-mono text-red-400 block mb-1">🧠 COMPILATEUR LOGIQUE (MINDMAP) :</span>
                         <div id="log-box" class="flex-1 bg-black/80 border border-red-950 rounded-xl p-2.5 font-mono overflow-y-auto custom-scroll space-y-1.5 text-stone-300 shadow-inner">
@@ -134,10 +244,7 @@
                         </div>
                     </div>
                 </div>
-
-                <button id="btn-phase" class="w-full bg-red-950 hover:bg-red-900 border border-red-700 text-red-100 font-oath font-bold py-3 rounded-xl tracking-widest text-xs uppercase transition mt-3 z-10 shadow-lg">
-                    ${GameState.phase === "rest" ? "Calculer le Tour du Prince 🤖" : "Valider la Phase ➔"}
-                </button>
+                <button id="btn-phase" class="w-full bg-red-950 hover:bg-red-900 border border-red-700 text-red-100 font-oath font-bold py-3 rounded-xl tracking-widest text-xs uppercase transition mt-3 z-10 shadow-lg">${btnText}</button>
             `;
 
                 document.getElementById("btn-phase").onclick = () =>
