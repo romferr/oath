@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Oath - Assistant de Chronique v2</title>
+        <title>Oath - Assistant de Chronique</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <style>
             @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&display=swap");
@@ -24,20 +24,20 @@
                 border-radius: 2px;
             }
 
-            /* Conteneur de carte dynamique avec aspect ratio d'origine */
+            /* Conteneur de carte dynamique (Aspect ratio d'origine d'une carte Oath) */
             .oath-card-container {
                 width: 105px;
                 height: 146px;
                 border-radius: 6px;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-                background-size: 500% 400%; /* Grille 5x4 */
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.6);
+                background-size: 500% 400%; /* Grille 5x4 des planches */
                 transition:
                     transform 0.2s ease,
                     box-shadow 0.2s ease;
             }
             .oath-card-container:hover {
-                transform: translateY(-4px) scale(1.05);
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.7);
+                transform: translateY(-6px) scale(1.05);
+                box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.8);
                 z-index: 30;
             }
         </style>
@@ -95,241 +95,9 @@
 
         <div class="flex-1 grid grid-cols-3 gap-2 min-h-0 mb-1.5">
             <section
-                id="board-regions"
-                class="col-span-2 bg-stone-950/40 border border-stone-900 rounded-xl p-1.5 flex flex-col justify-between gap-1.5"
+                id="board-locations"
+                class="col-span-2 bg-stone-950/40 border border-stone-900 rounded-xl p-2 flex flex-row gap-3 min-h-0 h-full"
             ></section>
-
-            <section
-                class="bg-stone-900/20 border border-stone-800/60 rounded-xl p-3 flex flex-col justify-between"
-            >
-                <span
-                    class="text-[10px] uppercase font-oath tracking-widest text-stone-500 border-b border-stone-800 pb-1"
-                    >Flux de la Chronique</span
-                >
-                <div
-                    id="log-box"
-                    class="flex-1 my-2 overflow-y-auto custom-scroll text-[11px] font-mono space-y-1 text-stone-400"
-                ></div>
-                <button
-                    id="btn-next-phase"
-                    class="w-full bg-amber-800 border border-amber-700/50 py-2.5 rounded-lg font-oath font-bold tracking-widest text-amber-100 text-xs uppercase shadow-md"
-                ></button>
-            </section>
         </div>
-
-        <div class="grid grid-cols-2 gap-2 mb-1.5 shrink-0">
-            <div
-                class="bg-stone-900/30 border border-stone-800/80 p-2 rounded-xl flex flex-col h-44"
-            >
-                <span
-                    class="text-[10px] uppercase font-oath tracking-widest text-amber-500/80 font-bold mb-1"
-                    >📜 Votre Conseiller (Main)</span
-                >
-                <div
-                    id="conseiller-container"
-                    class="flex-1 flex gap-3 overflow-x-auto custom-scroll items-center px-1"
-                ></div>
-            </div>
-            <div
-                class="bg-stone-900/30 border border-stone-800/80 p-2 rounded-xl flex flex-col h-44"
-            >
-                <span
-                    class="text-[10px] uppercase font-oath tracking-widest text-purple-400/80 font-bold mb-1"
-                    >💎 Reliques Possédées</span
-                >
-                <div
-                    id="relics-container"
-                    class="flex-1 flex gap-2 overflow-x-auto custom-scroll items-center"
-                ></div>
-            </div>
-        </div>
-
-        <footer
-            id="player-mat"
-            class="w-full bg-stone-900 border-t border-stone-800 rounded-xl p-3 shrink-0 flex flex-col gap-2"
-        >
-            <div class="flex justify-between items-center text-xs">
-                <div class="flex gap-2 font-mono">
-                    <div
-                        class="bg-stone-950 px-2 py-0.5 rounded border border-stone-800"
-                    >
-                        🪙 Favor:
-                        <strong id="stat-favor" class="text-amber-400"></strong>
-                    </div>
-                    <div
-                        class="bg-stone-950 px-2 py-0.5 rounded border border-stone-800"
-                    >
-                        👁️ Secret:
-                        <strong
-                            id="stat-secrets"
-                            class="text-purple-400"
-                        ></strong>
-                    </div>
-                    <div
-                        class="bg-stone-950 px-2 py-0.5 rounded border border-stone-800"
-                    >
-                        👥 Troupes:
-                        <strong id="stat-pool" class="text-cyan-400"></strong>
-                    </div>
-                </div>
-                <div
-                    class="flex items-center gap-1.5 bg-stone-950 p-1 rounded border border-stone-800"
-                >
-                    <span
-                        class="text-[9px] font-mono text-stone-500 font-bold uppercase"
-                        >Provisions :</span
-                    >
-                    <div id="reserve-track" class="flex gap-0.5"></div>
-                </div>
-            </div>
-            <div id="action-grid" class="grid grid-cols-6 gap-1.5"></div>
-        </footer>
-
-        <script type="module">
-            import { GameState } from "./js/state.js";
-            import {
-                AssetConfig,
-                CardsDatabase,
-                PhaseData,
-                Suits,
-            } from "./js/database.js";
-            import { advancePhase, executeAction } from "./js/actions.js";
-
-            document.getElementById("btn-next-phase").onclick = () => {
-                const current = GameState.currentPhase;
-                advancePhase();
-                if (current !== GameState.currentPhase) {
-                    const data = PhaseData[GameState.currentPhase];
-                    document.getElementById("modal-phase-num").innerText =
-                        data.num;
-                    document.getElementById("modal-phase-title").innerText =
-                        data.title;
-                    document.getElementById("modal-phase-body").innerHTML =
-                        data.body;
-                    document
-                        .getElementById("phase-modal")
-                        .classList.remove("hidden");
-                }
-            };
-
-            function buildCardUI(cardId) {
-                const card = CardsDatabase[cardId];
-                if (!card) {
-                    return `<div class="oath-card-container border border-stone-800 bg-center" style="background-image: url('${AssetConfig.cardsPath}cardbackDefault.jpg'); background-size: cover;"></div>`;
-                }
-
-                // Formule mathématique de positionnement sur la planche (0 à 100%)
-                const posX = card.sprite.col * 25;
-                const posY = card.sprite.row * 33.333;
-
-                return `
-                <div class="oath-card-container border border-stone-950 flex flex-col justify-between relative group cursor-pointer"
-                     style="background-image: url('${AssetConfig.cardsPath}${card.sprite.sheet}'); background-position: ${posX}% ${posY}%;">
-                     <div class="absolute bottom-0 inset-x-0 bg-black/80 text-[9px] text-stone-300 p-1 opacity-0 group-hover:opacity-100 transition-opacity truncate text-center">
-                        ${card.title}
-                     </div>
-                </div>`;
-            }
-
-            function render() {
-                document.getElementById("stat-favor").innerText =
-                    GameState.player.favor;
-                document.getElementById("stat-secrets").innerText =
-                    GameState.player.secrets;
-                document.getElementById("stat-pool").innerText =
-                    GameState.player.poolWarbands;
-                document.getElementById("phase-indicator").innerText =
-                    `PHASE ACTUELLE : ${GameState.currentPhase.toUpperCase()}`;
-
-                const btnNext = document.getElementById("btn-next-phase");
-                btnNext.innerText =
-                    GameState.currentPhase === "wake"
-                        ? "Valider le Réveil ➔"
-                        : GameState.currentPhase === "action"
-                          ? "Terminer les Actions ➔"
-                          : "Lancer le Prochain Tour ↺";
-
-                const mat = document.getElementById("player-mat");
-                mat.className =
-                    GameState.currentPhase === "action"
-                        ? "w-full bg-stone-900 border-t border-stone-700 rounded-xl p-3 shrink-0 flex flex-col gap-2 opacity-100"
-                        : "w-full bg-stone-900 border-t border-stone-800 rounded-xl p-3 shrink-0 flex flex-col gap-2 opacity-30 pointer-events-none";
-
-                const track = document.getElementById("reserve-track");
-                track.innerHTML = Array.from(
-                    { length: 6 },
-                    (_, i) =>
-                        `<div class="w-2.5 h-2.5 rounded-full border ${i < GameState.player.reserve ? "bg-cyan-500 border-cyan-400" : "bg-transparent border-stone-800"}"></div>`,
-                ).join("");
-
-                document.getElementById("board-regions").innerHTML =
-                    GameState.regions
-                        .map((reg, idx) => {
-                            const isActive = GameState.player.location === idx;
-                            const cardsHTML = reg.cards
-                                .map((cId) => buildCardUI(cId))
-                                .join("");
-                            return `
-                    <div class="flex-1 bg-cover bg-center border ${isActive ? "border-amber-500 shadow-md" : "border-stone-800"} rounded-lg overflow-hidden relative" style="background-image: url('${AssetConfig.mapsPath}map_${idx + 1}.jpg');">
-                        <div class="absolute inset-0 ${isActive ? "bg-amber-950/10" : "bg-stone-950/40"} p-2 flex flex-col justify-between">
-                            <div class="flex justify-between items-start w-full bg-black/50 p-1.5 rounded backdrop-blur-sm border border-stone-900/40">
-                                <div>
-                                    <span class="text-[8px] text-amber-500 uppercase tracking-wider font-bold">Territoire</span>
-                                    <h3 class="font-oath text-xs font-bold text-white uppercase">${reg.name}</h3>
-                                </div>
-                                <div class="bg-stone-950 px-2 py-0.5 rounded text-[10px] border border-stone-800 font-mono">Armées: <strong class="text-red-400">${reg.garrison}</strong></div>
-                            </div>
-                            <div class="flex gap-2 overflow-x-auto custom-scroll pb-1 pt-4 items-center">${cardsHTML}</div>
-                        </div>
-                    </div>`;
-                        })
-                        .join("");
-
-                document.getElementById("conseiller-container").innerHTML =
-                    GameState.inventory.cards.length === 0
-                        ? `<span class="text-[11px] text-stone-600 italic m-auto">Aucun conseiller en main</span>`
-                        : GameState.inventory.cards
-                              .map((cId) => buildCardUI(cId))
-                              .join("");
-                document.getElementById("relics-container").innerHTML =
-                    GameState.inventory.relics
-                        .map(
-                            (r) =>
-                                `<div class="bg-purple-950/40 border border-purple-800/60 px-3 py-1 rounded text-xs text-purple-300 font-mono shadow-sm">💎 ${r}</div>`,
-                        )
-                        .join("");
-                document.getElementById("log-box").innerHTML = GameState.logs
-                    .map(
-                        (l) =>
-                            `<div><span class="text-stone-600">[${l.time}]</span> ${l.msg}</div>`,
-                    )
-                    .join("");
-                const box = document.getElementById("log-box");
-                box.scrollTop = box.scrollHeight;
-            }
-
-            const actionsDef = [
-                { key: "search", label: "🔍 Recherche", cost: "2 🔹" },
-                { key: "muster", label: "🛡️ Enrôlement", cost: "1 🔹" },
-                { key: "trade", label: "⚖️ Commerce", cost: "1 🔹" },
-                { key: "recover", label: "👑 Récupération", cost: "1 🔹" },
-                { key: "campaign", label: "⚔️ Campagne", cost: "3 🔹" },
-                { key: "travel", label: "🧭 Voyage", cost: "1 🔹" },
-            ];
-            document.getElementById("action-grid").innerHTML = actionsDef
-                .map(
-                    (act) =>
-                        `<button id="act-${act.key}" class="bg-stone-950 border border-stone-800 rounded-lg p-1.5 text-center hover:bg-stone-900 active:scale-95 cursor-pointer"><div class="text-[10px] font-bold text-amber-500 uppercase">${act.label}</div><div class="text-[9px] text-cyan-500 font-mono">${act.cost}</div></button>`,
-                )
-                .join("");
-            actionsDef.forEach(
-                (act) =>
-                    (document.getElementById(`act-${act.key}`).onclick = () =>
-                        executeAction(act.key)),
-            );
-
-            window.addEventListener("statechange", render);
-            render();
-        </script>
     </body>
 </html>
