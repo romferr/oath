@@ -1,66 +1,61 @@
 // js/actions.js
-import { GameState } from "./state.js";
 
-export function advancePhase() {
-  GameState.update((state) => {
-    if (state.currentPhase === "wake") {
-      state.currentPhase = "action";
-      state.addLog("⚔️ Phase d'actions ouverte.", "system");
-    } else if (state.currentPhase === "action") {
-      state.currentPhase = "rest";
-      state.addLog("🌙 Passage à la phase de repos.", "system");
-    } else if (state.currentPhase === "rest") {
-      // Règle de ravitaillement officielle basée sur la réserve de troupes d'Oath
-      let baseGain =
-        state.player.poolWarbands >= 10
-          ? 5
-          : state.player.poolWarbands >= 6
-            ? 4
-            : 3;
-      state.player.reserve = Math.min(6, state.player.reserve + baseGain);
-      state.currentPhase = "wake";
-      state.addLog(`✨ Ravitaillement : +${baseGain} 🔹 générés.`, "success");
-    }
-  });
-}
+import { GameState, notifyStateChange, pushLog } from "./state.js";
+import { PrinceEngine } from "./prince.js";
 
-export function executeAction(actionKey) {
-  if (GameState.currentPhase !== "action") return;
-
-  const costs = {
-    search: 2,
-    campaign: 3,
-    travel: 1,
-    muster: 1,
-    trade: 1,
-    recover: 1,
-  };
-  const cost = costs[actionKey] || 1;
-
-  if (GameState.player.reserve < cost) {
-    alert("Provisions insuffisantes !");
+export function executePlayerAction(actionType) {
+  if (GameState.phase !== "action") {
+    pushLog("Impossible : Ce n'est pas la phase d'action du joueur.", "system");
     return;
   }
 
-  GameState.update((state) => {
-    state.player.reserve -= cost;
-
-    if (actionKey === "travel") {
-      state.player.location = (state.player.location + 1) % 3;
-      state.addLog(
-        `🧭 Voyage vers : ${state.regions[state.player.location].name}`,
-      );
-    } else if (actionKey === "muster") {
-      if (state.player.poolWarbands >= 2) {
-        state.player.poolWarbands -= 2;
-        state.player.boardWarbands += 2;
-        state.addLog("🛡️ Enrôlement de 2 armées locales.");
-      } else {
-        state.player.reserve += cost; // Remboursement en cas d'erreur
-        alert("Plus de troupes en réserve globale !");
+  switch (actionType) {
+    case "travel":
+      if (GameState.player.supply >= 1) {
+        GameState.player.location = (GameState.player.location + 1) % 3;
+        GameState.player.supply -= 1;
+        pushLog(
+          `L'Exilé voyage vers : ${GameState.regions[GameState.player.location].name}.`,
+        );
       }
-    } else {
-      state.addLog(`Action standard effectuée : ${actionKey.toUpperCase()}`);
-    }
-  });
+      break;
+
+    case "muster":
+      if (GameState.player.supply >= 1) {
+        GameState.player.warbands += 2;
+        GameState.player.supply -= 1;
+        pushLog("L'Exilé enrôle des troupes dans sa réserve (+2 Armées).");
+      }
+      break;
+
+    case "search":
+      if (GameState.player.supply >= 2) {
+        GameState.player.supply -= 2;
+        pushLog(
+          "L'Exilé fouille le deck du Royaume à la recherche d'habitants.",
+        );
+      }
+      break;
+  }
+  notifyStateChange();
+}
+
+export function advancePhase() {
+  if (GameState.phase === "wake") {
+    GameState.phase = "action";
+    pushLog("Ouverture de la phase d'Action du Joueur.");
+  } else if (GameState.phase === "action") {
+    GameState.phase = "rest";
+    pushLog("Le joueur se repose. Transition vers le tour de l'Automa.");
+  } else if (GameState.phase === "rest") {
+    // Lancement séquentiel de l'IA
+    PrinceEngine.executeTurn();
+
+    // Reset pour le prochain round
+    GameState.phase = "wake";
+    GameState.turn += 1;
+    GameState.player.supply = Math.min(6, GameState.player.supply + 2); // Régénération standard
+    pushLog(`--- Début du Round Économique ${GameState.turn} ---`);
+  }
+  notifyStateChange();
 }

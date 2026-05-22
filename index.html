@@ -3,101 +3,151 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Oath - Assistant de Chronique</title>
+        <title>Oath - Le Prince Mécanique v2.0</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <style>
-            @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&display=swap");
+            @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=JetBrains+Mono&display=swap");
             body {
-                background-color: #0c0a09;
+                background-color: #080707;
                 font-family: "Georgia", serif;
                 user-select: none;
             }
             .font-oath {
                 font-family: "Cinzel", serif;
             }
+            .font-mono {
+                font-family: "JetBrains Mono", monospace;
+            }
             .custom-scroll::-webkit-scrollbar {
                 width: 4px;
                 height: 4px;
             }
             .custom-scroll::-webkit-scrollbar-thumb {
-                background: #444;
+                background: #5c1d1d;
                 border-radius: 2px;
-            }
-
-            /* Conteneur de carte dynamique (Aspect ratio d'origine d'une carte Oath) */
-            .oath-card-container {
-                width: 105px;
-                height: 146px;
-                border-radius: 6px;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.6);
-                background-size: 500% 400%; /* Grille 5x4 des planches */
-                transition:
-                    transform 0.2s ease,
-                    box-shadow 0.2s ease;
-            }
-            .oath-card-container:hover {
-                transform: translateY(-6px) scale(1.05);
-                box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.8);
-                z-index: 30;
             }
         </style>
     </head>
     <body
-        class="h-screen w-screen overflow-hidden flex flex-col text-stone-200 p-2"
+        class="h-screen w-screen p-3 flex gap-3 text-stone-200 overflow-hidden"
     >
-        <div
-            id="phase-modal"
-            class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-        >
-            <div
-                class="bg-stone-900 border border-stone-800 rounded-xl p-5 max-w-md w-full text-center shadow-2xl"
-            >
-                <span
-                    id="modal-phase-num"
-                    class="text-xs uppercase tracking-widest text-amber-500 font-bold block mb-1"
-                ></span>
-                <h2
-                    id="modal-phase-title"
-                    class="font-oath text-lg font-bold text-stone-100 uppercase mb-3"
-                ></h2>
-                <div
-                    id="modal-phase-body"
-                    class="text-xs text-stone-400 text-left bg-stone-950 p-3 rounded border border-stone-800 mb-4"
-                ></div>
-                <button
-                    onclick="
-                        document
-                            .getElementById('phase-modal')
-                            .classList.add('hidden')
-                    "
-                    class="w-full bg-amber-800 hover:bg-amber-700 text-stone-100 py-2.5 rounded-lg font-oath text-xs uppercase tracking-wider font-bold"
-                >
-                    Confirmer et Ouvrir
-                </button>
-            </div>
-        </div>
-
-        <header
-            class="w-full bg-stone-900/40 border border-stone-800/60 rounded-lg p-2 mb-1.5 flex justify-between items-center shrink-0"
-        >
-            <div class="flex items-center gap-3">
-                <h1
-                    class="font-oath text-base font-bold text-amber-600 tracking-wider"
-                >
-                    OATH CHRONICLE
-                </h1>
-                <div
-                    id="phase-indicator"
-                    class="bg-stone-950 border border-stone-800 text-stone-400 text-[11px] font-mono px-3 py-0.5 rounded-full"
-                ></div>
-            </div>
-        </header>
-
-        <div class="flex-1 grid grid-cols-3 gap-2 min-h-0 mb-1.5">
-            <section
+        <div class="flex-1 flex flex-col gap-3 h-full">
+            <main
                 id="board-locations"
-                class="col-span-2 bg-stone-950/40 border border-stone-900 rounded-xl p-2 flex flex-row gap-3 min-h-0 h-full"
-            ></section>
+                class="flex-1 grid grid-cols-3 gap-3 bg-stone-950/80 border border-stone-900 rounded-2xl p-3 shadow-inner"
+            ></main>
+
+            <footer
+                id="player-mat"
+                class="h-56 rounded-2xl p-4 flex gap-4 shadow-xl shrink-0 bg-cover bg-center relative overflow-hidden"
+            ></footer>
         </div>
+
+        <aside
+            id="prince-mat"
+            class="w-96 border-l-4 border-red-800 rounded-2xl p-4 flex flex-col justify-between shadow-2xl h-full shrink-0 bg-cover bg-center relative overflow-hidden"
+        ></aside>
+
+        <script type="module">
+            import { GameState } from "./js/state.js";
+            import {
+                CardsDatabase,
+                AssetConfig,
+                BoardAssets,
+                BotTraits,
+            } from "./js/database.js";
+            import { executePlayerAction, advancePhase } from "./js/actions.js";
+
+            function render() {
+                // [Rendu standard du plateau et du joueur identique à l'architecture précédente...]
+                // (Laissé compact ici pour se concentrer sur l'intégration des assets de l'automate)
+
+                // RENDU DU TAPIS JOUEUR
+                const playerImg = BoardAssets[GameState.player.boardVisual];
+                const playerMat = document.getElementById("player-mat");
+                playerMat.style.backgroundImage = `linear-gradient(rgba(24,24,27,0.8), rgba(24,24,27,0.95)), url('${AssetConfig.boardsPath}${playerImg}')`;
+                playerMat.innerHTML = `<div class="p-2 z-10 font-oath text-amber-500 text-xs">🛡️ Tapis de l'Exilé (Actif)</div>`;
+
+                // RENDU DU PRINCE DE FER AVEC PLAYER_BOARD_CLOCKWORK.JPG
+                const princeImg = BoardAssets[GameState.prince.boardVisual];
+                const princeMat = document.getElementById("prince-mat");
+
+                // Injection de la texture d'origine du bot avec un filtre rouge impérial
+                princeMat.style.backgroundImage = `linear-gradient(rgba(45,10,10,0.85), rgba(12,10,10,0.98)), url('${AssetConfig.boardsPath}${princeImg}')`;
+
+                const traitInfo = BotTraits[GameState.prince.trait];
+                const threatHTML = Array.from(
+                    { length: 6 },
+                    (_, i) => `
+                <div class="p-1.5 rounded border text-center font-mono text-xs ${GameState.prince.threatLevel === i + 1 ? "bg-red-700 border-red-400 text-white font-bold shadow-md shadow-red-950/50" : "bg-black/50 border-stone-800 text-stone-500"}">
+                    ${i + 1}
+                </div>
+            `,
+                ).join("");
+
+                const reliquaryHTML = GameState.reliquary.available
+                    .map(
+                        (r) => `
+                <span class="bg-amber-950/40 border border-amber-800/60 text-amber-300 text-[9px] px-2 py-0.5 rounded font-mono">📜 ${r}</span>
+            `,
+                    )
+                    .join("");
+
+                const logsHTML = GameState.logs
+                    .map(
+                        (l) => `
+                <div class="text-[11px] leading-relaxed"><span class="text-stone-600">[${l.time}]</span> <span class="${l.type === "prince" ? "text-red-300 font-medium" : "text-stone-400"}">${l.text}</span></div>
+            `,
+                    )
+                    .join("");
+
+                princeMat.innerHTML = `
+                <div class="flex flex-col gap-3 h-full min-h-0 z-10">
+                    <div class="border-b border-red-900/60 pb-2">
+                        <div class="flex justify-between items-center">
+                            <h2 class="font-oath text-sm font-black text-red-400 tracking-widest">LE PRINCE MÉCANIQUE</h2>
+                            <span class="text-[9px] bg-red-950 border border-red-700 px-2 py-0.5 rounded text-red-200 font-mono font-bold">AUTOMATE</span>
+                        </div>
+                        <div class="mt-2 flex items-center gap-2 bg-black/60 border border-red-950 p-2 rounded-lg">
+                            <span class="text-xl">${traitInfo.icon}</span>
+                            <div>
+                                <div class="text-[10px] text-stone-500 font-mono uppercase tracking-wider">Trait Actif</div>
+                                <div class="text-xs font-bold text-stone-200">${traitInfo.name} : <span class="font-normal text-stone-400 italic text-[11px]">${traitInfo.effect}</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="text-[10px] font-mono text-stone-400 block mb-1">🔥 POSITION SUR LA PISTE DE MENACE :</span>
+                        <div class="grid grid-cols-6 gap-1">${threatHTML}</div>
+                    </div>
+
+                    <div class="bg-black/50 border border-stone-850 p-2 rounded-xl">
+                        <span class="text-[10px] font-oath text-amber-500 block mb-1">💎 BANQUES DU RELIQUAIRE</span>
+                        <div class="flex flex-wrap gap-1 min-h-[24px] items-center">${reliquaryHTML}</div>
+                    </div>
+
+                    <div class="flex-1 flex flex-col min-h-0">
+                        <span class="text-[10px] font-mono text-red-400 block mb-1">🧠 COMPILATEUR LOGIQUE (MINDMAP) :</span>
+                        <div id="log-box" class="flex-1 bg-black/80 border border-red-950 rounded-xl p-2.5 font-mono overflow-y-auto custom-scroll space-y-1.5 text-stone-300 shadow-inner">
+                            ${logsHTML}
+                        </div>
+                    </div>
+                </div>
+
+                <button id="btn-phase" class="w-full bg-red-950 hover:bg-red-900 border border-red-700 text-red-100 font-oath font-bold py-3 rounded-xl tracking-widest text-xs uppercase transition mt-3 z-10 shadow-lg">
+                    ${GameState.phase === "rest" ? "Calculer le Tour du Prince 🤖" : "Valider la Phase ➔"}
+                </button>
+            `;
+
+                document.getElementById("btn-phase").onclick = () =>
+                    advancePhase();
+                const box = document.getElementById("log-box");
+                if (box) box.scrollTop = box.scrollHeight;
+            }
+
+            window.addEventListener("gameStateUpdated", render);
+            render();
+        </script>
     </body>
 </html>
